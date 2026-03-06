@@ -37,7 +37,7 @@
    *(注：由于使用了 CDN 资源，首次打开需要联网)*
 
 ### 方式 2: 在线体验 (Demo)
-*(在此处贴上你的 GitHub Pages 链接，例如: https://yourname.github.io/pixel-farm)*
+*https://abestapple.github.io/Pixelfarm/*
 
 ## 🕹️ 游戏指南 (Game Guide)
 
