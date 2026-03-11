@@ -33,7 +33,7 @@
 
 🎮 方式 1: 在线体验 (Demo)
 最快游玩本项目的方式，无需下载任何文件，点击即玩：
-👉 点击这里开始游戏 (GitHub Pages)
+👉 点击这里开始游戏 ([GitHub Pages](https://abestapple.github.io/Pixelfarm/))
 
 🌐 方式 2: 直接运行 (免安装环境)
 适合不想配置 Node.js 环境的普通玩家。
