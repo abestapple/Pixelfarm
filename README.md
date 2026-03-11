@@ -64,6 +64,7 @@ npm run preview
 
 ### 🔹 4.1 编译纯净网页版
 Bash
+----------------------------
 ### 1. 安装基础依赖
 npm install
 
@@ -80,6 +81,7 @@ npm run preview
 
 环境初始化：
 Bash
+----------------------------
 ### 安装 Capacitor 核心及脚手架
 npm install @capacitor/core
 npm install @capacitor/cli --save-dev
@@ -94,6 +96,7 @@ npx cap add android
 以后每次修改游戏代码后，只需执行以下步骤即可生成新的 APK：
 
 Bash
+----------------------------
 ### 1. 重新生成最新版的前端构建文件 (dist)
 npm run build 
 
