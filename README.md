@@ -32,11 +32,35 @@
 ## 🎮 如何开始 (How to Play)
 
 ### 方式 1: 直接运行
-1. 下载本仓库中的所有文件。
+1. 下载本仓库中的'main'分支中所有文件；
 2. 直接用浏览器（Chrome/Edge/Safari）打开即可游玩！
    *(注：由于使用了 CDN 资源，首次打开需要联网)*
+   
+### 方式 2: 基于npm运行
+1. 下载本仓库中的'V1.1'分支中所有文件；
+2. npm run preview
+3. 直接用浏览器（Chrome/Edge/Safari）输出上步出现的网址打开即可游玩！
 
-### 方式 2: 在线体验 (Demo)
+### 方式 3: 基于npm运行（build）
+1. 下载本仓库中的'V1.2'分支中所有文件；
+2. 安装项目所需的基础依赖 npm install
+3. npm install -D tailwindcss @tailwindcss/vite
+4. npm run build
+5. npm run preview
+6. 直接用浏览器（Chrome/Edge/Safari）输出上步出现的网址打开即可游玩！
+7. 打包安卓apk（可以不需要）
+npm install @capacitor/core
+npm install @capacitor/cli --save-dev
+npx cap init （输入游戏名字和反向域名（随意））
+npm install @capacitor/android
+npx cap add android
+重新生成最新版的 dist 文件
+npm run build 
+把 dist 里的文件完美同步到 android 文件夹中
+npx cap sync
+npx cap open android （Android Studio）
+Build->Build Bundle(s) / APK(s) -> 点击 Build APK(s) 
+### 方式 4: 在线体验 (Demo)
 *https://abestapple.github.io/Pixelfarm/*
 
 ## 🕹️ 游戏指南 (Game Guide)
