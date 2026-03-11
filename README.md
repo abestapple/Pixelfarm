@@ -31,11 +31,11 @@
 
 ## 🎮 如何开始 (How to Play)
 
-🎮 方式 1: 在线体验 (Demo)
+## 🎮 方式 1: 在线体验 (Demo)
 最快游玩本项目的方式，无需下载任何文件，点击即玩：
 👉 点击这里开始游戏 ([GitHub Pages](https://abestapple.github.io/Pixelfarm/))
 
-🌐 方式 2: 直接运行 (免安装环境)
+## 🌐 方式 2: 直接运行 (免安装环境)
 适合不想配置 Node.js 环境的普通玩家。
 
 下载本仓库 main 分支中的所有文件。
@@ -44,7 +44,7 @@
 
 💡 注： 由于部分基础运行库使用了 CDN 资源，首次打开该版本需要保持网络畅通。
 
-💻 方式 3: 本地运行 (开发环境)
+## 💻 方式 3: 本地运行 (开发环境)
 适合想要查看源码或进行简单修改的开发者。
 
 下载本仓库 V1.1 分支中的所有文件。
@@ -56,49 +56,48 @@ npm install
 npm run preview
 终端会输出一个本地服务地址（如 http://localhost:4173/），复制该网址到浏览器中打开即可。
 
-📦 方式 4: 自行编译与打包 (进阶/安卓 APK)
+## 📦 方式 4: 自行编译与打包 (进阶/安卓 APK)
 适合想要深度定制、打包纯净网页版或将其打包为独立安卓 App 的开发者。请下载 V1.2 分支中的所有文件。
 
-🔹 4.1 编译纯净网页版
+###🔹 4.1 编译纯净网页版
 Bash
-# 1. 安装基础依赖
+### 1. 安装基础依赖
 npm install
 
-# 2. 安装 TailwindCSS 样式依赖
+### 2. 安装 TailwindCSS 样式依赖
 npm install -D tailwindcss @tailwindcss/vite
 
-# 3. 执行生产环境打包
+### 3. 执行生产环境打包
 npm run build
 
-# 4. 预览打包后的最终形态
+### 4. 预览打包后的最终形态
 npm run preview
-📱 4.2 进阶：打包为安卓 APK (需安装 Android Studio)
+### 📱 4.2 进阶：打包为安卓 APK (需安装 Android Studio)
 如果你想把游戏装进手机里，可以利用 Capacitor 将其打包为原生 App。
 
 环境初始化：
-
 Bash
-# 安装 Capacitor 核心及脚手架
+### 安装 Capacitor 核心及脚手架
 npm install @capacitor/core
 npm install @capacitor/cli --save-dev
 
-# 初始化项目（按提示输入游戏名称和包名，例如 com.pixel.farm）
+### 初始化项目（按提示输入游戏名称和包名，例如 com.pixel.farm）
 npx cap init 
 
-# 添加 Android 平台支持
+### 添加 Android 平台支持
 npm install @capacitor/android
 npx cap add android
 同步与打包：
 以后每次修改游戏代码后，只需执行以下步骤即可生成新的 APK：
 
 Bash
-# 1. 重新生成最新版的前端构建文件 (dist)
+### 1. 重新生成最新版的前端构建文件 (dist)
 npm run build 
 
-# 2. 将网页文件同步注入到安卓工程中
+### 2. 将网页文件同步注入到安卓工程中
 npx cap sync
 
-# 3. 唤起 Android Studio
+### 3. 唤起 Android Studio
 npx cap open android 
 在自动打开的 Android Studio 界面中：
 等待底部进度条加载完毕 -> 点击顶部菜单栏的 Build -> 选择 Build Bundle(s) / APK(s) -> 点击 Build APK(s)，等待右下角提示成功即可获取你的专属游戏安装包！
