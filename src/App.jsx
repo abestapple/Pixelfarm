@@ -1,0 +1,2585 @@
+import React, { useState, useEffect, useRef } from 'react';
+import './index.css';
+// ==================== Constants ====================
+    const PlantDB = {
+      daisy: { id: 'daisy', name: '小雏菊', category: 'flower', cost: 10, sellPrice: 30, growthDays: 3, optTempMin: 15, optTempMax: 25, unlockPrice: 0, icon: '🌼', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🌼', dead: '🥀' }, imageUrl: 'daisy_mature.png', stageImages: { seed: 'vet/daisy_seed.png', sprout: 'vet/daisy_sprout.png', growing: 'vet/daisy_growing.png', mature: 'vet/daisy_mature.png', dead: 'vet/daisy_dead.png' } },
+      tulip: { id: 'tulip', name: '郁金香', category: 'flower', cost: 18, sellPrice: 55, growthDays: 4, optTempMin: 12, optTempMax: 24, unlockPrice: 0, icon: '🌷', stageIcons: { seed: '🧅', sprout: '🌱', growing: '🌿', mature: '🌷', dead: '🥀' }, imageUrl: 'vet/tulip_mature.png', stageImages: { seed: 'vet/tulip_seed.png', sprout: 'vet/tulip_sprout.png', growing: 'vet/tulip_growing.png', mature: 'vet/tulip_mature.png', dead: 'vet/tulip_dead.png' } },
+      rose: { id: 'rose', name: '玫瑰', category: 'flower', cost: 25, sellPrice: 80, growthDays: 5, optTempMin: 18, optTempMax: 28, unlockPrice: 120, icon: '🌹', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🌹', dead: '🥀' }, imageUrl: 'vet/rose_mature.png', stageImages: { seed: 'vet/rose_seed.png', sprout: 'vet/rose_sprout.png', growing: 'vet/rose_growing.png', mature: 'vet/rose_mature.png', dead: 'vet/rose_dead.png' }  },
+      lily: { id: 'lily', name: '百合', category: 'flower', cost: 22, sellPrice: 70, growthDays: 4, optTempMin: 14, optTempMax: 26, unlockPrice: 120, icon: '🪷', stageIcons: { seed: '🧅', sprout: '🌱', growing: '🌿', mature: '🪷', dead: '🥀' }, imageUrl: 'vet/lily_mature.png', stageImages: { seed: 'vet/lily_seed.png', sprout: 'vet/lily_sprout.png', growing: 'vet/lily_growing.png', mature: 'vet/lily_mature.png', dead: 'vet/lily_dead.png' }  },
+      sunflower: { id: 'sunflower', name: '向日葵', category: 'flower', cost: 30, sellPrice: 95, growthDays: 5, optTempMin: 16, optTempMax: 30, unlockPrice: 150, icon: '🌻', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🍀', mature: '🌻', dead: '🥀' }, imageUrl: 'vet/sunflower_mature.png', stageImages: { seed: 'vet/sunflower_seed.png', sprout: 'vet/sunflower_sprout.png', growing: 'vet/sunflower_growing.png', mature: 'vet/sunflower_mature.png', dead: 'vet/sunflower_dead.png' } },
+      carrot: { id: 'carrot', name: '胡萝卜', category: 'veg', cost: 12, sellPrice: 35, growthDays: 3, optTempMin: 10, optTempMax: 24, unlockPrice: 0, icon: '🥕', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🥕', dead: '🍂' }, imageUrl: 'vet/carrot_mature.png', stageImages: { seed: 'vet/carrot_seed.png', sprout: 'vet/carrot_sprout.png', growing: 'vet/carrot_growing.png', mature: 'vet/carrot_mature.png', dead: 'vet/carrot_dead.png' } },
+      tomato: { id: 'tomato', name: '番茄', category: 'veg', cost: 16, sellPrice: 48, growthDays: 4, optTempMin: 14, optTempMax: 28, unlockPrice: 0, icon: '🍅', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🍅', dead: '🍂' }, imageUrl: 'vet/tomato_mature.png', stageImages: { seed: 'vet/tomato_seed.png', sprout: 'vet/tomato_sprout.png', growing: 'vet/tomato_growing.png', mature: 'vet/tomato_mature.png', dead: 'vet/tomato_dead.png' }  },
+      lettuce: { id: 'lettuce', name: '生菜', category: 'veg', cost: 14, sellPrice: 42, growthDays: 3, optTempMin: 8, optTempMax: 22, unlockPrice: 140, icon: '🥬', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🥬', dead: '🍂' }, imageUrl: 'vet/lettuce_mature.png', stageImages: { seed: 'vet/lettuce_seed.png', sprout: 'vet/lettuce_sprout.png', growing: 'vet/lettuce_growing.png', mature: 'vet/lettuce_mature.png', dead: 'vet/lettuce_dead.png' }   },
+      pumpkin: { id: 'pumpkin', name: '南瓜', category: 'veg', cost: 28, sellPrice: 90, growthDays: 6, optTempMin: 16, optTempMax: 30, unlockPrice: 170, icon: '🎃', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🎃', dead: '🍂' }, imageUrl: 'vet/pumpkin_mature.png', stageImages: { seed: 'vet/pumpkin_seed.png', sprout: 'vet/pumpkin_sprout.png', growing: 'vet/pumpkin_growing.png', mature: 'vet/pumpkin_mature.png', dead: 'vet/pumpkin_dead.png' }  },
+      broccoli: { id: 'broccoli', name: '西兰花', category: 'veg', cost: 18, sellPrice: 55, growthDays: 4, optTempMin: 10, optTempMax: 22, unlockPrice: 160, icon: '🥦', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🥦', dead: '🍂' }, imageUrl: 'vet/broccoli_mature.png', stageImages: { seed: 'vet/broccoli_seed.png', sprout: 'vet/broccoli_sprout.png', growing: 'vet/broccoli_growing.png', mature: 'vet/broccoli_mature.png', dead: 'vet/broccoli_dead.png' }  },
+      strawberry: { id: 'strawberry', name: '草莓', category: 'veg', cost: 20, sellPrice: 65, growthDays: 4, optTempMin: 15, optTempMax: 26, unlockPrice: 180, icon: '🍓', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🍓', dead: '🍂' }, imageUrl: 'vet/strawberry_mature.png', stageImages: { seed: 'vet/strawberry_seed.png', sprout: 'vet/strawberry_sprout.png', growing: 'vet/strawberry_growing.png', mature: 'vet/strawberry_mature.png', dead: 'vet/strawberry_dead.png' }   },
+      corn: { id: 'corn', name: '玉米', category: 'veg', cost: 24, sellPrice: 75, growthDays: 5, optTempMin: 18, optTempMax: 32, unlockPrice: 200, icon: '🌽', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🌽', dead: '🍂' }, imageUrl: 'vet/corn_mature.png', stageImages: { seed: 'vet/corn_seed.png', sprout: 'vet/corn_sprout.png', growing: 'vet/corn_growing.png', mature: 'vet/corn_mature.png', dead: 'vet/corn_dead.png' }    },
+      blueberry: { id: 'blueberry', name: '蓝莓', category: 'veg', cost: 35, sellPrice: 110, growthDays: 6, optTempMin: 12, optTempMax: 24, unlockPrice: 250, icon: '🫐', stageIcons: { seed: '🫘', sprout: '🌱', growing: '🌿', mature: '🫐', dead: '🍂' }, imageUrl: 'vet/blueberry_mature.png', stageImages: { seed: 'vet/blueberry_seed.png', sprout: 'vet/blueberry_sprout.png', growing: 'vet/blueberry_growing.png', mature: 'vet/blueberry_mature.png', dead: 'vet/blueberry_dead.png' }    },
+    };
+
+    const WeatherDB = {
+      Sunny: { id: 'Sunny', name: '晴', icon: '☀️', tempDelta: 5 },
+      Cloudy: { id: 'Cloudy', name: '多云', icon: '☁️', tempDelta: 0 },
+      Rainy: { id: 'Rainy', name: '雨', icon: '🌧️', tempDelta: -3 },
+      Freeze: { id: 'Freeze', name: '霜冻', icon: '❄️', tempDelta: -15 },
+    };
+
+    const GRID_SIZE = 5;
+    const PAGES = 2;
+    const INITIAL_UNLOCKED_TILES = 4;
+    const TILE_UNLOCK_BASE_COST = 50;
+    const TILE_UNLOCK_GROWTH = 1.5;
+    const DAY_DURATION_MS = 30 * 1000;
+
+    // ==================== Audio Manager ====================
+    class AudioManager {
+      constructor() {
+        this.bgms = {
+          Spring: this.createAudio('audio/sunshine.mp3', 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Eric_Skiff_-_Resistor_Anthems_-_01_A_Night_Of_Dizzy_Spells.ogg', true),
+          Summer: this.createAudio('audio/night.mp3', 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Eric_Skiff_-_Resistor_Anthems_-_02_Underclocked.ogg', true),
+          Autumn: this.createAudio('audio/relax.mp3', 'https://upload.wikimedia.org/wikipedia/commons/1/14/Eric_Skiff_-_Resistor_Anthems_-_06_Searching.ogg', true),
+          Winter: this.createAudio('audio/quiet.mp3', 'https://upload.wikimedia.org/wikipedia/commons/0/07/Eric_Skiff_-_Resistor_Anthems_-_07_We_re_the_Resistors.ogg', true),
+        };        
+
+        this.currentSeason = null;
+
+        this.rain = this.createAudio('audio/rain_heavy_loud.ogg', 'https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg', true);
+        this.wind = this.createAudio('audio/desert_howling_wind.ogg', 'https://actions.google.com/sounds/v1/weather/howling_wind.ogg', true);
+
+        this.sfxPlant = this.createAudio('audio/plant.ogg', 'https://actions.google.com/sounds/v1/foley/footstep_in_mud.ogg');
+        this.sfxHarvest = this.createAudio('audio/sfxHarvest.wav', 'https://actions.google.com/sounds/v1/foley/pulling_weeds.ogg');
+        this.sfxWater = this.createAudio('audio/sfxWater.wav', 'https://actions.google.com/sounds/v1/water/water_splash.ogg');
+        this.sfxTool = this.createAudio('audio/tool.ogg', 'https://actions.google.com/sounds/v1/tools/ratchet_wrench.ogg');
+        this.sfxMoney = this.createAudio('audio/sfxMoney.wav', 'https://actions.google.com/sounds/v1/foley/coins_dropping.ogg');
+        this.sfxError = this.createAudio('audio/error.ogg', 'https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+
+        this.isMuted = false;
+        this.volume = 0.7;
+        this.initialized = false;
+        this.updateVolumes();
+      }
+
+      createAudio(localPath, remoteUrl, loop = false) {
+        const audio = new Audio(localPath);
+        audio.loop = loop;
+        audio.preload = 'auto';
+        
+        audio.addEventListener('error', () => {
+          if (audio.src.includes(localPath)) {
+            console.log(`Local audio not found: ${localPath}, falling back to remote.`);
+            audio.src = remoteUrl;
+            audio.load();
+          }
+        }, { once: true });
+        
+        return audio;
+      }
+
+      init(startSeason = 'Spring') {
+        if (this.initialized) return;
+        this.initialized = true;
+        this.playSeasonBgm(startSeason);
+      }
+
+      // 核心方法：切换季节音乐
+      playSeasonBgm(season) {
+        if (this.isMuted) return;
+        if (this.currentSeason === season) return; // 如果季节没变，继续播放，不要打断
+
+        // 1. 停止当前音乐
+        if (this.currentSeason && this.bgms[this.currentSeason]) {
+          const oldBgm = this.bgms[this.currentSeason];
+          oldBgm.pause();
+          oldBgm.currentTime = 0;
+        }
+
+        // 2. 播放新季节音乐
+        this.currentSeason = season;
+        const newBgm = this.bgms[season];
+        if (newBgm) {
+          newBgm.volume = this.volume * 0.3;
+          newBgm.play().catch(e => console.log('BGM Play failed:', e));
+        }
+      }      
+
+
+      updateVolumes() {
+        const v = this.isMuted ? 0 : this.volume;
+        Object.values(this.bgms).forEach(bgm => bgm.volume = v * 0.9);
+        //this.bgm.volume = v * 0.3;
+        this.rain.volume = v * 0.5;
+        this.wind.volume = v * 0.5;
+        this.sfxPlant.volume = v * 0.7;
+        this.sfxHarvest.volume = v * 0.7;
+        this.sfxWater.volume = v * 0.7;
+        this.sfxTool.volume = v * 0.7;
+        this.sfxMoney.volume = v * 0.7;
+        this.sfxError.volume = v * 0.3;
+      }
+
+      toggleMute() {
+        this.isMuted = !this.isMuted;
+        if (this.isMuted) {
+          // 静音时暂停当前 BGM
+          if (this.currentSeason && this.bgms[this.currentSeason]) {
+            this.bgms[this.currentSeason].pause();
+          }
+          this.rain.pause();
+          this.wind.pause();
+        } else {
+          // 取消静音时恢复当前 BGM
+          if (this.currentSeason && this.bgms[this.currentSeason]) {
+            this.bgms[this.currentSeason].play().catch(() => {});
+          }
+          this.updateVolumes();
+        }
+        return this.isMuted;
+      }
+
+      playSfx(audio) {
+        if (this.isMuted) return;
+        if (!this.initialized) this.initialized = true;
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+
+      playPlant() { this.playSfx(this.sfxPlant); }
+      playHarvest() { this.playSfx(this.sfxHarvest); }
+      playWater() { this.playSfx(this.sfxWater); }
+      playTool() { this.playSfx(this.sfxTool); }
+      playMoney() { this.playSfx(this.sfxMoney); }
+      playError() { this.playSfx(this.sfxError); }
+
+      updateWeather(weatherId) {
+        if (!this.initialized) return;
+        if (weatherId === 'Rainy') {
+          if (this.rain.paused) this.rain.play().catch(() => {});
+          this.wind.pause();
+        } else if (weatherId === 'Freeze') {
+          if (this.wind.paused) this.wind.play().catch(() => {});
+          this.rain.pause();
+        } else {
+          this.rain.pause();
+          this.wind.pause();
+        }
+      }
+    }
+
+    const audioManager = new AudioManager();
+
+    // ==================== Game Store ====================
+    const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+    const randomPick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const weatherKeys = Object.keys(WeatherDB);
+    const plantIds = Object.keys(PlantDB);
+
+    const SAVE_KEY = 'pixel-farm.progress.v1';
+    const AUTO_SAVE_MS = 30 * 1000;
+    const PROFILE_AVATARS = [
+      'profile/avatar_1.png',
+      'profile/avatar_2.png',
+      'profile/avatar_3.png',
+      'profile/avatar_4.png',
+      'profile/avatar_5.png',
+      'profile/avatar_6.png',
+      'profile/avatar_7.png',
+      'profile/avatar_8.png',
+      'profile/avatar_9.png',
+      'profile/avatar_10.png',
+      'profile/avatar_11.png',
+      'profile/avatar_12.png',
+    ];
+
+    const createTile = (id, isUnlocked) => ({
+      id,
+      isUnlocked,
+      plantId: null,
+      stage: 'seed',
+      daysGrown: 0,
+      soilMoisture: 100,
+      soilFertility: 100,
+      soilProtectDays: 0,
+      fertilityProtectDays: 0,
+      health: 0,
+      pesticideDays: 0,
+      antifreezeDays: 0,
+      buggedToday: false,
+      lastHarvestPlantId: null,
+      harvestCategoryHistory: [],
+      samePlantStreak: 0,
+      fertileForThisCrop: false,
+      sellMultiplier: 1,
+      currentCropCategory: null,
+    });
+
+    const buildInitialState = () => ({
+      money: 500,
+      totalEarned: 0,
+      userProfile: {
+        avatarId: PROFILE_AVATARS[0]
+      },
+      currentDay: 1,
+      currentWeather: 'Sunny',
+      currentTemp: 22,
+      dailyEarned: 0,
+      market: {},
+      warehouseLots: [],
+      warehouseCapacity: 50,
+      warehouseLevel: 0,
+      unlockedPlants: { daisy: true, tulip: true, carrot: true, tomato: true },
+      codex: {},
+      goldenCanUnlocked: false,
+      nextDayAt: Date.now() + DAY_DURATION_MS,
+      nextDayEnv: null,
+      forecastWeatherId: null,
+      inventory: [
+        { itemId: 'daisy', count: 5 },
+        { itemId: 'tulip', count: 2 },
+        { itemId: 'carrot', count: 5 },
+        { itemId: 'tomato', count: 2 },
+        { itemId: 'fertilizer', count: 2 },
+        { itemId: 'pesticide', count: 0 },
+        { itemId: 'ripener', count: 0 },
+        { itemId: 'antifreeze', count: 0 },
+      ],
+      farmGrid: Array.from({ length: GRID_SIZE * GRID_SIZE * PAGES }, (_, i) => {
+        const page = Math.floor(i / (GRID_SIZE * GRID_SIZE));
+        const idxInPage = i % (GRID_SIZE * GRID_SIZE);
+        const row = Math.floor(idxInPage / GRID_SIZE);
+        const col = idxInPage % GRID_SIZE;
+        return createTile(`tile_${page}_${row}_${col}`, page === 0 && row < 2 && col < 2);
+      }),
+    });
+
+    const buildInitialUI = () => ({
+      modal: null,
+      picker: null,
+      selected: { kind: 'tool', id: 'water' },
+      oneKeyEnabled: false,
+      toast: null,
+      floatingTexts: [],
+      audioMuted: false,
+      audioVolume: 0.5,
+      showCropLabels: true,
+    });
+
+    class GameStore {
+      constructor() {
+        this.state = buildInitialState();
+        this.UI = buildInitialUI();
+        this.listeners = [];
+        const loaded = this.loadProgress();
+        if (!loaded) {
+          this.boot();
+        } else {
+          if (!this.state.market || !Object.keys(this.state.market).length) this.rollMarket();
+          if (!this.state.nextDayEnv) this.planTomorrow();
+        }
+        this.startAutoSave();
+      }
+
+      setAudioVolume(value) {
+        // 限制在 0 到 1 之间
+        const v = clamp(value, 0, 1);
+        this.UI.audioVolume = v;
+        this.UI.audioMuted = (v === 0); // 如果音量是0，自动设为静音
+
+        // 更新 AudioManager
+        window.GameStore.audioManager.volume = v;
+        window.GameStore.audioManager.isMuted = this.UI.audioMuted;
+        window.GameStore.audioManager.updateVolumes();
+
+        this.notify();
+      }
+
+      subscribe(listener) {
+        this.listeners.push(listener);
+        return () => {
+          this.listeners = this.listeners.filter(l => l !== listener);
+        };
+      }
+
+      notify() {
+        this.listeners.forEach(l => l());
+      }
+
+      startAutoSave() {
+        if (this._autoSaveTimer) window.clearInterval(this._autoSaveTimer);
+        this._autoSaveTimer = window.setInterval(() => this.saveProgress(), AUTO_SAVE_MS);
+        window.addEventListener('beforeunload', this._onBeforeUnload ?? (this._onBeforeUnload = () => this.saveProgress()));
+      }
+
+      syncAudioMuted(isMuted) {
+        this.UI.audioMuted = !!isMuted;
+        audioManager.isMuted = this.UI.audioMuted;
+        audioManager.updateVolumes();
+      }
+
+      saveProgress() {
+        try {
+          const remainingMs = clamp(this.state.nextDayAt - Date.now(), 0, DAY_DURATION_MS);
+          const payload = {
+            v: 1,
+            savedAt: Date.now(),
+            remainingMs,
+            state: {
+              money: this.state.money,
+              totalEarned: this.state.totalEarned,
+              userProfile: this.state.userProfile,
+              currentDay: this.state.currentDay,
+              currentWeather: this.state.currentWeather,
+              currentTemp: this.state.currentTemp,
+              dailyEarned: this.state.dailyEarned,
+              market: this.state.market,
+              warehouseLots: this.state.warehouseLots,
+              warehouseCapacity: this.state.warehouseCapacity,
+              warehouseLevel: this.state.warehouseLevel,
+              unlockedPlants: this.state.unlockedPlants,
+              codex: this.state.codex,
+              goldenCanUnlocked: this.state.goldenCanUnlocked,
+              nextDayEnv: this.state.nextDayEnv,
+              forecastWeatherId: this.state.forecastWeatherId,
+              inventory: this.state.inventory,
+              farmGrid: this.state.farmGrid,
+            },
+            ui: {
+              selected: this.UI.selected,
+              oneKeyEnabled: this.UI.oneKeyEnabled,
+              audioMuted: this.UI.audioMuted,
+            },
+          };
+          localStorage.setItem(SAVE_KEY, JSON.stringify(payload));
+        } catch (_) {}
+      }
+
+      loadProgress() {
+        try {
+          const raw = localStorage.getItem(SAVE_KEY);
+          if (!raw) return false;
+          const payload = JSON.parse(raw);
+          if (!payload || payload.v !== 1) return false;
+
+          const baseState = buildInitialState();
+          const baseUI = buildInitialUI();
+          const savedState = payload.state && typeof payload.state === 'object' ? payload.state : null;
+          const savedUI = payload.ui && typeof payload.ui === 'object' ? payload.ui : null;
+
+          if (savedState) {
+            this.state = { ...baseState, ...savedState };
+
+            if (Array.isArray(savedState.farmGrid) && savedState.farmGrid.length === baseState.farmGrid.length) {
+              this.state.farmGrid = baseState.farmGrid.map((baseTile, i) => {
+                const t = savedState.farmGrid[i];
+                return { ...baseTile, ...(t && typeof t === 'object' ? t : {}) };
+              });
+            } else {
+              this.state.farmGrid = baseState.farmGrid;
+            }
+
+            if (Array.isArray(savedState.inventory)) {
+              this.state.inventory = savedState.inventory
+                .filter((x) => x && typeof x === 'object')
+                .map((x) => ({ itemId: x.itemId, count: x.count }));
+            } else {
+              this.state.inventory = baseState.inventory;
+            }
+
+            if (!this.state.userProfile || !this.state.userProfile.avatarId) {
+              this.state.userProfile = { avatarId: baseState.userProfile.avatarId };
+            }
+            if (typeof this.state.totalEarned !== 'number') {
+              this.state.totalEarned = 0;
+            }
+          } else {
+            this.state = baseState;
+          }
+
+          const remainingMs = typeof payload.remainingMs === 'number' ? payload.remainingMs : DAY_DURATION_MS;
+          this.state.nextDayAt = Date.now() + clamp(remainingMs, 0, DAY_DURATION_MS);
+
+          if (savedUI) {
+            this.UI = { ...baseUI, ...savedUI, modal: null, picker: null, toast: null, floatingTexts: [] };
+            const vol = typeof savedUI.audioVolume === 'number' ? savedUI.audioVolume : 0.5;
+            this.UI.audioVolume = vol;
+            window.GameStore.audioManager.volume = vol; 
+            this.UI.showCropLabels = savedUI.showCropLabels !== undefined ? savedUI.showCropLabels : true;           
+          } else {
+            this.UI = baseUI;
+          }
+
+          this.syncAudioMuted(this.UI.audioMuted);
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      clearProgress() {
+        try {
+          localStorage.removeItem(SAVE_KEY);
+        } catch (_) {}
+      }
+
+      resetGame() {
+        const keepMuted = !!this.UI.audioMuted;
+        this.state = buildInitialState();
+        this.UI = buildInitialUI();
+        this.syncAudioMuted(keepMuted);
+        this.boot();
+        this.notify();
+      }
+
+      boot() {
+        const { weatherId, temp } = this.rollWeatherAndTemp(this.state.currentDay);
+        this.state.currentWeather = weatherId;
+        this.state.currentTemp = temp;
+        this.rollMarket();
+        this.planTomorrow();
+        this.state.nextDayAt = Date.now() + DAY_DURATION_MS;
+      }
+
+      getSeason(day) {
+        const seasons = ['Spring', 'Summer', 'Autumn', 'Winter'];
+        return seasons[Math.floor((day - 1) / 30) % 4];
+      }
+
+      rollWeatherAndTemp(day) {
+        const season = this.getSeason(day);
+        const r = Math.random();
+        let weatherId = 'Sunny';
+        let baseTemp = 15;
+
+        if (season === 'Spring') {
+          if (r < 0.5) weatherId = 'Sunny';
+          else if (r < 0.8) weatherId = 'Cloudy';
+          else weatherId = 'Rainy';
+          baseTemp = 10 + Math.floor(Math.random() * 15);
+        } else if (season === 'Summer') {
+          if (r < 0.6) weatherId = 'Sunny';
+          else if (r < 0.8) weatherId = 'Cloudy';
+          else weatherId = 'Rainy';
+          baseTemp = 25 + Math.floor(Math.random() * 15);
+        } else if (season === 'Autumn') {
+          if (r < 0.4) weatherId = 'Sunny';
+          else if (r < 0.8) weatherId = 'Cloudy';
+          else if (r < 0.95) weatherId = 'Rainy';
+          else weatherId = 'Freeze';
+          baseTemp = 10 + Math.floor(Math.random() * 15);
+        } else if (season === 'Winter') {
+          if (r < 0.3) weatherId = 'Sunny';
+          else if (r < 0.6) weatherId = 'Cloudy';
+          else weatherId = 'Freeze';
+          baseTemp = -5 + Math.floor(Math.random() * 15);
+        }
+
+        const weather = WeatherDB[weatherId];
+        const temp = clamp(baseTemp + weather.tempDelta, -10, 45);
+        return { weatherId, temp };
+      }
+
+      rollMarket() {
+        for (const id of plantIds) {
+          this.state.market[id] = 0.8 + Math.random() * 0.4;
+        }
+      }
+
+      planTomorrow() {
+        this.state.nextDayEnv = this.rollWeatherAndTemp(this.state.currentDay + 1);
+        if (Math.random() < 0.3) {
+          this.state.forecastWeatherId = this.state.nextDayEnv.weatherId;
+        } else {
+          const others = weatherKeys.filter((x) => x !== this.state.nextDayEnv.weatherId);
+          this.state.forecastWeatherId = randomPick(others);
+        }
+      }
+
+      getInventoryCount(itemId) {
+        return this.state.inventory.find((x) => x.itemId === itemId)?.count ?? 0;
+      }
+
+      setInventoryCount(itemId, count) {
+        const idx = this.state.inventory.findIndex((x) => x.itemId === itemId);
+        if (idx === -1) {
+          this.state.inventory.push({ itemId, count: Math.max(0, count) });
+        } else {
+          this.state.inventory[idx].count = Math.max(0, count);
+        }
+        this.notify();
+      }
+
+      decInventory(itemId, delta) {
+        const current = this.getInventoryCount(itemId);
+        if (current < delta) return false;
+        this.setInventoryCount(itemId, current - delta);
+        return true;
+      }
+
+      showToast(text) {
+          this.UI.toast = { 
+          text, 
+          until: Date.now() + 1500, 
+          id: Math.random().toString() 
+        };
+          this.notify();
+      }
+
+      pushFloatingText(text, tileIdx, color) {
+        this.UI.floatingTexts.push({ text, tileIdx, color, createdAt: Date.now(), duration: 900, id: Math.random().toString() });
+        this.notify();
+      }
+
+      getUnlockedTileCount() {
+        return this.state.farmGrid.filter((t) => t.isUnlocked).length;
+      }
+
+      getNextTileUnlockCost() {
+        const unlocked = this.getUnlockedTileCount();
+        if (unlocked >= GRID_SIZE * GRID_SIZE * PAGES) return null;
+        const purchased = Math.max(0, unlocked - INITIAL_UNLOCKED_TILES);
+        return Math.ceil(TILE_UNLOCK_BASE_COST * Math.pow(TILE_UNLOCK_GROWTH, purchased));
+      }
+
+      getWarehouseUsed() {
+        return this.state.warehouseLots.reduce((sum, lot) => sum + lot.count, 0);
+      }
+
+      getWarehouseExpandCost() {
+        return Math.ceil(200 * Math.pow(1.65, this.state.warehouseLevel));
+      }
+
+      tryExpandWarehouse() {
+        const cost = this.getWarehouseExpandCost();
+        if (this.state.money < cost) {
+          this.showToast('金币不足');
+          audioManager.playError();
+          return false;
+        }
+        this.state.money -= cost;
+        this.state.warehouseLevel += 1;
+        this.state.warehouseCapacity += 25;
+        this.showToast(`仓库容量提升至 ${this.state.warehouseCapacity}`);
+        audioManager.playMoney();
+        this.notify();
+        return true;
+      }
+
+      getSellPriceNow(plantId) {
+        const plant = PlantDB[plantId];
+        if (!plant) return 0;
+        const m = this.state.market[plantId] ?? 1;
+        return Math.max(1, Math.round(plant.sellPrice * m));
+      }
+
+      getSellValueForLot(plantId, health, sellMultiplier) {
+        const price = this.getSellPriceNow(plantId);
+        const quality = clamp(health, 0, 100) / 100;
+        return Math.max(0, Math.round(price * quality * (sellMultiplier ?? 1)));
+      }
+
+      addEarnings(amount) {
+        if (!amount || amount <= 0) return;
+        this.state.money += amount;
+        this.state.dailyEarned += amount;
+        this.state.totalEarned += amount;
+      }
+
+      getUnlockedCodexCount() {
+        return Object.keys(this.state.codex ?? {}).length;
+      }
+
+      getCodexSCount() {
+        return Object.values(this.state.codex ?? {}).filter((g) => g === 'S').length;
+      }
+
+      getLevelInfo() {
+        const total = Math.max(0, this.state.totalEarned ?? 0);
+        let level = 0;
+        while (total >= 500 * Math.pow(level + 1, 2)) {
+          level += 1;
+        }
+        const currentNeed = level === 0 ? 0 : 500 * Math.pow(level, 2);
+        const nextNeed = 500 * Math.pow(level + 1, 2);
+        return { level, currentNeed, nextNeed, total };
+      }
+
+      getUserTitle() {
+        const { level } = this.getLevelInfo();
+        const codexCount = this.getUnlockedCodexCount();
+        const codexSCount = this.getCodexSCount();
+        if (level >= 5 && codexSCount >= 5) return '神农再世';
+        if (level >= 4 && codexCount >= 8) return '农业大亨';
+        if (level >= 3 && codexCount >= 5) return '种菜狂魔';
+        if (level >= 2 && codexCount >= 3) return '勤劳农夫';
+        if (codexCount >= 1) return '田园守望者';
+        return '荒地开拓者';
+      }
+
+      sellAllOfPlant(plantId) {
+        const keep = [];
+        let total = 0;
+        for (const lot of this.state.warehouseLots) {
+          if (lot.plantId !== plantId) {
+            keep.push(lot);
+            continue;
+          }
+          total += this.getSellValueForLot(lot.plantId, lot.health, lot.sellMultiplier) * lot.count;
+        }
+        if (total <= 0) {
+          this.showToast('仓库中没有该作物');
+          audioManager.playError();
+          return;
+        }
+        this.state.warehouseLots = keep;
+        this.addEarnings(total);
+        this.showToast(`已售卖 +${total}`);
+        audioManager.playMoney();
+        this.notify();
+      }
+
+      sellAllWarehouse() {
+        if (!this.state.warehouseLots.length) {
+          this.showToast('仓库空空如也');
+          audioManager.playError();
+          return;
+        }
+        let total = 0;
+        for (const lot of this.state.warehouseLots) {
+          total += this.getSellValueForLot(lot.plantId, lot.health, lot.sellMultiplier) * lot.count;
+        }
+        if (total <= 0) {
+          this.showToast('仓库中没有可售卖作物');
+          audioManager.playError();
+          return;
+        }
+        this.state.warehouseLots = [];
+        this.addEarnings(total);
+        this.showToast(`一键售卖 +${total}`);
+        audioManager.playMoney();
+        this.notify();
+      }
+
+      getPlantStage(tile) {
+        if (!tile.plantId) return null;
+        if (tile.health <= 0) return 'dead';
+        const plant = PlantDB[tile.plantId];
+        if (!plant) return 'dead';
+        if (tile.daysGrown >= plant.growthDays) return 'mature';
+        if (tile.daysGrown === 0) return 'seed';
+        if (tile.daysGrown < plant.growthDays * 0.4) return 'sprout';
+        return 'growing';
+      }
+
+      getSoilHealth(tile) {
+        return (tile.soilFertility + tile.soilMoisture) / 200;
+      }
+
+      gradeFromHealth(health) {
+        return health >= 90 ? 'S' : health >= 70 ? 'A' : 'B';
+      }
+
+      updateCodexAfterHarvest(plantId, health) {
+        const grade = this.gradeFromHealth(health);
+        const gradeOrder = { B: 1, A: 2, S: 3 };
+        const prev = this.state.codex[plantId];
+        if (!prev || gradeOrder[grade] > (gradeOrder[prev] ?? 0)) {
+          this.state.codex[plantId] = grade;
+          this.showToast(`图鉴更新：${PlantDB[plantId]?.name ?? plantId} ${grade}级`);
+        }
+        if (!this.state.goldenCanUnlocked) {
+          const allS = plantIds.every((id) => this.state.codex[id] === 'S');
+          if (allS) {
+            this.state.goldenCanUnlocked = true;
+            this.showToast('成就达成：解锁黄金喷壶');
+          }
+        }
+      }
+
+      endDayAndStartNext() {
+        const dayEnded = this.state.currentDay;
+        const earned = this.state.dailyEarned;
+        this.state.dailyEarned = 0;
+
+        const deathList = [];
+        const pestList = [];
+        const dayWeather = WeatherDB[this.state.currentWeather];
+        const dayTemp = this.state.currentTemp;
+
+        for (const tile of this.state.farmGrid) tile.buggedToday = false;
+
+        for (const tile of this.state.farmGrid) {
+          if (!tile.isUnlocked) continue;
+          if (tile.soilProtectDays > 0) {
+            tile.soilMoisture = 100;
+            //tile.soilFertility = 100;
+          } else {
+            if (dayWeather.id === 'Sunny') tile.soilMoisture = clamp(tile.soilMoisture - 5, 0, 100);
+            if (dayWeather.id === 'Cloudy') tile.soilMoisture = clamp(tile.soilMoisture - 2, 0, 100);
+            if (dayWeather.id === 'Rainy') tile.soilMoisture = 100;
+          }
+
+          if (!tile.plantId) continue;
+          tile.stage = this.getPlantStage(tile) ?? tile.stage;
+          if (tile.stage === 'dead') continue;
+
+          if (tile.fertilityProtectDays > 0) {
+             tile.soilFertility = 100;
+            } else {
+             tile.soilFertility = clamp(tile.soilFertility - 2, 0, 100);
+          }
+
+          const plant = PlantDB[tile.plantId];
+          if (plant) {
+            const inRange = dayTemp >= plant.optTempMin && dayTemp <= plant.optTempMax;
+            if (tile.stage !== 'mature') {
+              let grow = 0.3 + (inRange ? 0.7 : 0.2);
+              tile.daysGrown += grow;
+            }
+            if (dayWeather.id !== 'Freeze' || tile.antifreezeDays <= 0) {
+              if (dayTemp < plant.optTempMin) tile.health -= 3;
+              else if (dayTemp > plant.optTempMax) tile.health -= 2;
+              else if (dayWeather.id === 'Sunny') tile.health += 2;
+            }
+
+            const soilAvg = (tile.soilFertility + tile.soilMoisture) / 2;
+            if (soilAvg < 30) {
+              tile.health -= 3;
+            } else if (soilAvg < 60) {
+              tile.health -= 1;
+            } else if (soilAvg >= 80) {
+              tile.health += 2;
+            }
+          } else {
+            tile.health -= 100;
+          }
+
+          tile.health = clamp(tile.health, 0, 100);
+          tile.stage = this.getPlantStage(tile) ?? tile.stage;
+          
+          if (tile.stage === 'dead') {
+            deathList.push(PlantDB[tile.plantId]?.name ?? tile.plantId);
+          }
+        }
+
+        if (Math.random() < 0.05) {
+          const candidates = this.state.farmGrid.filter((t) => t.isUnlocked && t.plantId && this.getPlantStage(t) !== 'dead');
+          if (candidates.length) {
+            const maxHit = Math.min(3, Math.max(1, Math.ceil(candidates.length * 0.25)));
+            const hitCount = 1 + Math.floor(Math.random() * maxHit);
+            for (let i = 0; i < hitCount; i += 1) {
+              const idx = Math.floor(Math.random() * candidates.length);
+              const tile = candidates.splice(idx, 1)[0];
+              if (!tile) continue;
+              if (tile.pesticideDays > 0) continue;
+              tile.health = clamp(tile.health - 10, 0, 100);
+              tile.buggedToday = true;
+              pestList.push(tile.id);
+              tile.stage = this.getPlantStage(tile) ?? tile.stage;
+              if (tile.stage === 'dead') {
+                deathList.push(PlantDB[tile.plantId]?.name ?? tile.plantId);
+              }
+            }
+          }
+        }
+
+        for (const tile of this.state.farmGrid) {
+          if (tile.pesticideDays > 0) tile.pesticideDays -= 1;
+          if (tile.antifreezeDays > 0) tile.antifreezeDays -= 1;
+          if (tile.soilProtectDays > 0) tile.soilProtectDays -= 1;
+          if (tile.fertilityProtectDays > 0) tile.fertilityProtectDays -= 1;
+        }
+
+        this.state.currentDay += 1;
+        const currentSeason = this.getSeason(this.state.currentDay);
+        audioManager.playSeasonBgm(currentSeason);
+        if (!this.state.nextDayEnv) this.planTomorrow();
+        this.state.currentWeather = this.state.nextDayEnv.weatherId;
+        this.state.currentTemp = this.state.nextDayEnv.temp;
+        this.rollMarket();
+        this.planTomorrow();
+
+        this.state.nextDayAt = Date.now() + DAY_DURATION_MS;
+        if (deathList.length > 0 || pestList.length > 0) {
+          this.UI.modal = {
+            type: 'settlement',
+            data: { dayEnded, earned, deathList, pestCount: pestList.length },
+            autoCloseAt: Date.now() + 5000,
+          };
+        } else {
+          this.showToast(`第 ${dayEnded} 天：收入 +${earned}`);
+        }
+        this.notify();
+      }
+
+      resetTileCrop(tile) {
+        tile.plantId = null;
+        tile.stage = 'seed';
+        tile.daysGrown = 0;
+        tile.health = 0;
+        tile.buggedToday = false;
+        tile.fertileForThisCrop = false;
+        tile.sellMultiplier = 1;
+        tile.currentCropCategory = null;
+      }
+
+      getSellPenaltyMultiplier(streak) {
+        return clamp(1 - 0.15 * streak, 0.5, 1);
+      }
+
+      actOnTile(tileIdx, silent = false) {
+        if (!silent) {
+        const now = Date.now();
+        if (this._lastActTime && now - this._lastActTime < 300) return;
+        this._lastActTime = now;
+      }
+        //console.log(this._lastActTime)
+        const tile = this.state.farmGrid[tileIdx];
+        if (!tile) return;
+        if (!tile.isUnlocked) {
+          this.showToast('土地未解锁，可去商店解锁');
+          if (!silent) audioManager.playError();
+          return;
+        }
+
+        const stage = this.getPlantStage(tile);
+
+        if (this.UI.selected.kind === 'tool') {
+          if (this.UI.selected.id === 'water') {
+            if (stage === 'dead') {
+              this.showToast('枯草需要用铲子清除');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            tile.soilMoisture = 100;
+            tile.soilProtectDays = 3;
+            this.showToast('浇水完成');
+            if (!silent) audioManager.playWater();
+            this.notify();
+            return;
+          }
+
+          if (this.UI.selected.id === 'goldWater') {
+            const page = Math.floor(tileIdx / (GRID_SIZE * GRID_SIZE));
+            const idxInPage = tileIdx % (GRID_SIZE * GRID_SIZE);
+            const baseRow = Math.floor(idxInPage / GRID_SIZE);
+            const baseCol = idxInPage % GRID_SIZE;
+            for (let dr = 0; dr < 2; dr += 1) {
+              for (let dc = 0; dc < 2; dc += 1) {
+                const r = baseRow + dr;
+                const c = baseCol + dc;
+                if (r >= GRID_SIZE || c >= GRID_SIZE) continue;
+                const idx = page * (GRID_SIZE * GRID_SIZE) + r * GRID_SIZE + c;
+                const t = this.state.farmGrid[idx];
+                if (!t?.isUnlocked) continue;
+                if (this.getPlantStage(t) === 'dead') continue;
+                t.soilMoisture = 100;
+                t.soilProtectDays = 3;
+              }
+            }
+            this.showToast('2×2 浇水完成');
+            if (!silent) audioManager.playWater();
+            this.notify();
+            return;
+          }
+
+          if (this.UI.selected.id === 'shovel') {
+            if (stage !== 'dead') {
+              this.showToast('只能清除枯草');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            this.resetTileCrop(tile);
+            this.showToast('已清除');
+            if (!silent) audioManager.playTool();
+            this.notify();
+            return;
+          }
+
+          if (this.UI.selected.id === 'sickle') {
+            if (stage !== 'mature') {
+              this.showToast('未成熟，无法收割');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            const plant = PlantDB[tile.plantId];
+            if (tile.plantId) this.updateCodexAfterHarvest(tile.plantId, tile.health);
+
+            if (this.getWarehouseUsed() >= this.state.warehouseCapacity) {
+              this.showToast('仓库已满，请扩建仓库或售卖已存作物');
+              if (!silent) audioManager.playError();
+              return;
+            }
+
+            if (tile.plantId) {
+              this.state.warehouseLots.push({
+                plantId: tile.plantId,
+                count: 1,
+                health: tile.health,
+                sellMultiplier: tile.sellMultiplier ?? 1,
+              });
+            }
+
+            if (tile.plantId && plant) {
+              tile.lastHarvestPlantId = tile.plantId;
+              const h = tile.harvestCategoryHistory;
+              h.push(plant.category);
+              while (h.length > 2) h.shift();
+            }
+            this.resetTileCrop(tile);
+            this.pushFloatingText('+1', tileIdx, '#16A34A');
+            this.showToast('收割成功：已存入仓库');
+            if (!silent) audioManager.playHarvest();
+            this.notify();
+            return;
+          }
+        }
+
+        if (this.UI.selected.kind === 'item') {
+          if (this.UI.selected.id === 'fertilizer') {
+
+            if (tile.soilFertility >= 100 || tile.fertilityProtectDays > 0) {
+              this.showToast('土壤已经很肥沃了');
+              if (!silent) audioManager.playError();
+              return;
+            }
+
+            if (!this.decInventory('fertilizer', 1)) {
+              this.showToast('肥料不足');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            tile.soilFertility = 100;
+            tile.fertilityProtectDays = 3;
+            this.showToast('施肥完成（土壤肥沃=100）');
+            if (!silent) audioManager.playTool();
+            this.notify();
+            return;
+          }
+
+          if (this.UI.selected.id === 'pesticide') {
+            if (tile.pesticideDays > 0 && !tile.buggedToday) {
+              this.showToast('已处于杀虫剂保护中');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            if (!this.decInventory('pesticide', 1)) {
+              this.showToast('杀虫剂不足');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            tile.pesticideDays = 3;
+            tile.buggedToday = false;
+            this.showToast('已喷洒（3 天免疫）');
+            if (!silent) audioManager.playTool();
+            this.notify();
+            return;
+          }
+          if (this.UI.selected.id === 'ripener') {
+            if (!tile.plantId || stage === 'dead' || stage === 'mature') {
+              this.showToast('只能对未成熟作物使用催熟剂');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            if (!this.decInventory('ripener', 1)) {
+              this.showToast('催熟剂不足');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            tile.daysGrown += 0.5;
+            tile.stage = this.getPlantStage(tile) ?? tile.stage;
+            this.showToast('已使用催熟剂（+0.5 天进度）');
+            if (!silent) audioManager.playTool();
+            this.notify();
+            return;
+          }
+
+          if (this.UI.selected.id === 'antifreeze') {
+            if (!tile.plantId || stage === 'dead') {
+              this.showToast('只能对存活作物使用抗冻剂');
+              if (!silent) audioManager.playError();
+              return;
+            }
+
+            if (tile.antifreezeDays > 0) {
+              this.showToast('作物已处于抗冻保护中');
+              if (!silent) audioManager.playError();
+              return;
+            }
+
+            if (!this.decInventory('antifreeze', 1)) {
+              this.showToast('抗冻剂不足');
+              if (!silent) audioManager.playError();
+              return;
+            }
+            tile.antifreezeDays = 3;
+            this.showToast('已使用抗冻剂（3 天抗冻）');
+            if (!silent) audioManager.playTool();
+            this.notify();
+            return;
+          }
+
+          this.showToast('请选择一个可用道具');
+          if (!silent) audioManager.playError();
+          return;
+        }
+
+        if (this.UI.selected.kind === 'seed') {
+          const plantId = this.UI.selected.id;
+          const plant = PlantDB[plantId];
+          if (!plant) {
+            this.showToast('未知种子');
+            if (!silent) audioManager.playError();
+            return;
+          }
+          if (!this.state.unlockedPlants[plantId]) {
+            this.showToast('该植物尚未解锁');
+            if (!silent) audioManager.playError();
+            return;
+          }
+          if (tile.plantId) {
+            this.showToast('这块地已经有植物了');
+            if (!silent) audioManager.playError();
+            return;
+          }
+          if (!this.decInventory(plantId, 1)) {
+            this.showToast('种子不足');
+            if (!silent) audioManager.playError();
+            return;
+          }
+          const last = tile.lastHarvestPlantId;
+          if (last === plantId) tile.samePlantStreak += 1;
+          else tile.samePlantStreak = 0;
+          tile.sellMultiplier = this.getSellPenaltyMultiplier(tile.samePlantStreak);
+          tile.currentCropCategory = plant.category;
+          tile.plantId = plantId;
+          tile.stage = 'seed';
+          tile.daysGrown = 0;
+          tile.health = 100;
+          this.showToast(`播种成功: ${plant.name}`);
+          if (!silent) audioManager.playPlant();
+          this.notify();
+        }
+      }
+
+      oneKeyAction() {
+        const kind = this.UI.selected.kind;
+        const id = this.UI.selected.id;
+        let applicableTiles = [];
+
+        for (let i = 0; i < this.state.farmGrid.length; i++) {
+          const tile = this.state.farmGrid[i];
+          if (!tile.isUnlocked) continue;
+          const stage = this.getPlantStage(tile);
+
+          if (kind === 'tool') {
+            if (id === 'sickle' && stage === 'mature') applicableTiles.push(i);
+            else if (id === 'shovel' && stage === 'dead') applicableTiles.push(i);
+            else if ((id === 'water' || id === 'goldWater') && stage !== 'dead' && tile.soilMoisture < 100) applicableTiles.push(i);
+          } else if (kind === 'item') {
+            if (id === 'fertilizer' && tile.soilFertility < 100) applicableTiles.push(i);
+            else if (id === 'pesticide' && tile.buggedToday && tile.pesticideDays <= 0) applicableTiles.push(i);
+            else if (id === 'ripener' && tile.plantId && stage !== 'dead' && stage !== 'mature') applicableTiles.push(i);
+            else if (id === 'antifreeze' && tile.plantId && stage !== 'dead' && tile.antifreezeDays <= 0) applicableTiles.push(i);
+          } else if (kind === 'seed') {
+            if (!this.state.unlockedPlants[id]) {
+              this.showToast('该植物尚未解锁');
+              return;
+            }
+            if (!tile.plantId) applicableTiles.push(i);
+          }
+        }
+
+        if (applicableTiles.length === 0) {
+          this.showToast('没有可操作的土地');
+          audioManager.playError();
+          return;
+        }
+
+        if (kind === 'item' || kind === 'seed') {
+          const inventoryCount = this.getInventoryCount(id);
+          if (inventoryCount < applicableTiles.length) {
+            this.showToast(`数量不足，无法一键操作（需要 ${applicableTiles.length}，拥有 ${inventoryCount}）`);
+            audioManager.playError();
+            return;
+          }
+        }
+
+        if (kind === 'tool' && id === 'sickle') {
+          const availableSpace = this.state.warehouseCapacity - this.getWarehouseUsed();
+          if (availableSpace < applicableTiles.length) {
+            this.showToast(`仓库空间不足，无法一键收获（需要 ${applicableTiles.length}，剩余 ${availableSpace}）`);
+            audioManager.playError();
+            return;
+          }
+        }
+
+        let actionCount = 0;
+        for (const idx of applicableTiles) {
+          this.actOnTile(idx, true);
+          actionCount++;
+        }
+
+        if (actionCount > 0) {
+          this.showToast(`一键操作完成（共 ${actionCount} 块土地）`);
+          if (kind === 'seed') audioManager.playPlant();
+          else if (kind === 'tool' && id === 'water') audioManager.playWater();
+          else if (kind === 'tool' && id === 'sickle') audioManager.playHarvest();
+          else audioManager.playTool();
+        }
+      }
+
+      tryBuyShopItem(item) {
+        if (item.disabled) {
+          audioManager.playError();
+          return;
+        }
+        if (this.state.money < item.price) {
+          this.showToast('金币不足');
+          audioManager.playError();
+          return;
+        }
+
+        if (item.kind === 'seed') {
+          if (!this.state.unlockedPlants[item.plantId]) {
+            this.showToast('该植物尚未解锁');
+            audioManager.playError();
+            return;
+          }
+          this.state.money -= item.price;
+          this.setInventoryCount(item.plantId, this.getInventoryCount(item.plantId) + 1);
+          this.showToast(`已购买 1 个 ${PlantDB[item.plantId].name} 种子`);
+          audioManager.playMoney();
+          return;
+        }
+
+        if (item.kind === 'fertilizer') {
+          this.state.money -= item.price;
+          this.setInventoryCount('fertilizer', this.getInventoryCount('fertilizer') + 1);
+          this.showToast('已购买 1 个肥料');
+          audioManager.playMoney();
+          return;
+        }
+
+        if (item.kind === 'pesticide') {
+          this.state.money -= item.price;
+          this.setInventoryCount('pesticide', this.getInventoryCount('pesticide') + 1);
+          this.showToast('已购买 1 个杀虫剂');
+          audioManager.playMoney();
+          return;
+        }
+
+        if (item.kind === 'ripener') {
+          this.state.money -= item.price;
+          this.setInventoryCount('ripener', this.getInventoryCount('ripener') + 1);
+          this.showToast('已购买 1 个催熟剂');
+          audioManager.playMoney();
+          return;
+        }
+
+        if (item.kind === 'antifreeze') {
+          this.state.money -= item.price;
+          this.setInventoryCount('antifreeze', this.getInventoryCount('antifreeze') + 1);
+          this.showToast('已购买 1 个抗冻剂');
+          audioManager.playMoney();
+          return;
+        }
+
+        if (item.kind === 'seedPack') {
+          const locked = plantIds.filter((id) => !this.state.unlockedPlants[id]);
+          if (!locked.length) {
+            this.showToast('已全部解锁');
+            audioManager.playError();
+            return;
+          }
+          this.state.money -= item.price;
+          const plantId = randomPick(locked);
+          this.state.unlockedPlants[plantId] = true;
+          this.setInventoryCount(plantId, this.getInventoryCount(plantId) + 2);
+          this.showToast(`解锁成功：${PlantDB[plantId].name}`);
+          audioManager.playMoney();
+          return;
+        }
+
+        if (item.kind === 'unlockPlant') {
+          const plant = PlantDB[item.plantId];
+          if (!plant) return;
+          if (this.state.unlockedPlants[plant.id]) {
+            this.showToast('已解锁');
+            return;
+          }
+          this.state.money -= item.price;
+          this.state.unlockedPlants[plant.id] = true;
+          this.setInventoryCount(plant.id, this.getInventoryCount(plant.id) + 2);
+          this.showToast(`解锁成功：${plant.name}`);
+          return;
+        }
+
+        const cost = this.getNextTileUnlockCost();
+        if (cost == null) {
+          this.showToast('已全部解锁');
+          return;
+        }
+        this.state.money -= item.price;
+        const locked = this.state.farmGrid.find((t) => !t.isUnlocked);
+        if (locked) locked.isUnlocked = true;
+        this.showToast('已解锁 1 块新土地');
+        this.notify();
+      }
+    }
+
+    const store = new GameStore();
+
+    // ==================== Export for React Components ====================
+    window.GameStore = {
+      store,
+      PlantDB,
+      WeatherDB,
+      GRID_SIZE,
+      PAGES,
+      audioManager,
+      DAY_DURATION_MS
+    };
+
+    // ==================== React Components ====================
+    //const { useState, useEffect, useRef } = React;
+
+    function useStore() {
+      const [, setTick] = useState(0);
+      useEffect(() => {
+        return window.GameStore.store.subscribe(() => setTick(t => t + 1));
+      }, []);
+      return window.GameStore.store;
+    }
+
+    const CropIcon = ({ plant, stage }) => {
+      const [imgError, setImgError] = useState(false);
+      const emoji = stage ? plant.stageIcons[stage] : '🌱';
+      const imageUrl = stage ? plant.stageImages?.[stage] : plant.imageUrl;
+      //console.log(imageUrl)
+      if (imageUrl && !imgError) {
+        return (
+          <img 
+                  key={imageUrl}  //20260302 zzz
+                  src={imageUrl} 
+                  alt={plant.name} 
+                  className={`
+                    object-contain animate-grow-bottom pointer-events-none transition-all duration-300
+                    ${stage === 'seed' ? 'w-[45%] h-[45%] opacity-80' : ''}
+                    ${stage === 'sprout' ? 'w-[70%] h-[55%] opacity-80' : ''}
+                    ${stage === 'growing' ? 'w-[85%] h-[62%]' : ''}
+                    ${stage === 'mature' ? 'w-[95%] h-[66%] drop-shadow-md hover:scale-105' : ''}
+                    ${stage === 'dead' ? 'w-[85%] h-[60%] grayscale opacity-60' : ''}
+                    ${!stage ? 'w-[45%] h-[45%]' : ''}
+                  `}
+                  style={{ imageRendering: 'auto' }}
+                  onError={() => setImgError(true)}
+                  referrerPolicy="no-referrer"
+                />
+        );
+      }
+
+      return <div className="text-2xl md:text-4xl mb-1">{emoji}</div>;
+    };
+
+    const WeatherOverlay = React.memo(({ weather }) => {
+      if (weather === 'Sunny') {
+        return (
+          <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
+            <div className="absolute inset-0 bg-yellow-400 opacity-10" />
+          </div>
+        );
+      }
+      
+      if (weather === 'Rainy') {
+        return (
+          <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
+            <div className="absolute inset-0 bg-blue-800/20" />
+            {Array.from({ length: 120 }).map((_, i) => (
+              <div 
+                key={i} 
+                className="absolute w-[1px] h-5 bg-blue-200/60 rounded-full"
+                style={{
+                  left: `${Math.random() * 120}%`,
+                  top: `-50px`,
+                  animation: `rain-fall ${1.2 + Math.random() * 1.5}s linear infinite`,
+                  animationDelay: `${Math.random() * 3}s`
+                }}
+              />
+            ))}
+          </div>
+        );
+      }
+
+      if (weather === 'Freeze') {
+        const snowflakes = ['❄', '❅', '❆'];
+        return (
+          <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
+            <div className="absolute inset-0 bg-blue-200/20" />
+            {Array.from({ length: 100 }).map((_, i) => (
+              <div 
+                key={i} 
+                className="absolute text-white drop-shadow-[0_0_3px_rgba(255,255,255,0.8)]"
+                style={{
+                  left: `${-10 + Math.random() * 120}%`,
+                  top: '50%',
+                  fontSize: `${0.5 + Math.random() * 1}rem`,
+                  opacity: 0.4 + Math.random() * 0.6,
+                  animation: `snow-fall ${5 + Math.random() * 5}s linear infinite`,
+                  animationDelay: `-${Math.random() * 10}s`
+                }}
+              >
+                {snowflakes[Math.floor(Math.random() * snowflakes.length)]}
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      if (weather === 'Cloudy') {
+        return (
+          <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
+            <div className="absolute inset-0 bg-black" style={{ animation: 'cloud-shadow 8s ease-in-out infinite' }} />
+          </div>
+        );
+      }
+
+      return null;
+    });
+
+    const Tile = ({ tile, bgColor, children, onClick, onLongPress }) => {
+      const timerRef = useRef(null);
+
+      const handleTouchStart = () => {
+        timerRef.current = setTimeout(() => {
+          onLongPress();
+          timerRef.current = null;
+        }, 500);
+      };
+
+      const handleTouchEnd = () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+          onClick();
+        }
+      };
+
+      const handleTouchMove = () => {
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+          timerRef.current = null;
+        }
+      };
+
+      return (
+        <div 
+          className={`relative w-full aspect-square rounded-xl ${tile.isUnlocked ? '' : 'border-2 border-slate-700'} ${bgColor} soil-transition flex items-center justify-center cursor-pointer overflow-hidden transition-transform active:scale-95`}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          onTouchMove={handleTouchMove}
+          onMouseDown={handleTouchStart}
+          onMouseUp={handleTouchEnd}
+          onMouseLeave={handleTouchMove}
+        >
+          {tile.isUnlocked && (
+            <div className="absolute inset-0 pointer-events-none z-10">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-[#8b5a2b] border-b border-[#5c3a18]" />
+              <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-[#8b5a2b] border-t border-[#5c3a18]" />
+              <div className="absolute top-0 bottom-0 left-0 w-1.5 bg-[#8b5a2b] border-r border-[#5c3a18]" />
+              <div className="absolute top-0 bottom-0 right-0 w-1.5 bg-[#8b5a2b] border-l border-[#5c3a18]" />
+              <div className="absolute top-0 left-2 w-2 h-2.5 bg-[#6b421a] rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+              <div className="absolute top-0 right-2 w-2 h-2.5 bg-[#6b421a] rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+              <div className="absolute bottom-0 left-2 w-2 h-2.5 bg-[#6b421a] rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+              <div className="absolute bottom-0 right-2 w-2 h-2.5 bg-[#6b421a] rounded-sm shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+              <div className="absolute top-1/2 left-0 w-2.5 h-2 -translate-y-1/2 bg-[#6b421a] rounded-sm shadow-[1px_0_2px_rgba(0,0,0,0.5)]" />
+              <div className="absolute top-1/2 right-0 w-2.5 h-2 -translate-y-1/2 bg-[#6b421a] rounded-sm shadow-[-1px_0_2px_rgba(0,0,0,0.5)]" />
+            </div>
+          )}
+          {children}
+        </div>
+      );
+    };
+
+    function BottomBtns({ label, sub, isActive, onClick }) {
+      return (
+        <button
+          onClick={onClick}
+          className={`h-14 rounded-xl border-b-4 flex flex-col items-center justify-center transition-transform active:scale-95 ${
+            isActive 
+              ? 'bg-amber-700 text-amber-50 border-amber-900 shadow-inner' 
+              : 'bg-[#d4a373] text-[#5c3a21] border-[#b07d4b] hover:bg-[#e6b88a]'
+          }`}
+        >
+          <div className="text-sm font-bold tracking-wide">{label}</div>
+          {sub && <div className={`text-[10px] mt-0.5 font-medium ${isActive ? 'text-amber-200' : 'text-[#8b5a2b]'}`}>{sub}</div>}
+        </button>
+      );
+    }
+
+    function Modal({ game }) {
+      const { UI, state } = game;
+      const modal = UI.modal;
+      if (!modal) return null;
+
+      const handleClose = () => {
+        UI.modal = null;
+        game.notify();
+      };
+
+      return (
+        <div className="absolute inset-0 bg-slate-900/80 z-40 flex items-center justify-center p-4">
+          <div className="bg-white text-slate-900 rounded-2xl w-full max-w-sm max-h-[80vh] flex flex-col overflow-hidden shadow-2xl animate-scale-in">
+            <div className="flex justify-between items-center p-4 border-b border-slate-200">
+              <h2 className="text-lg font-bold">
+                {modal.type === 'shop' ? '商店' : 
+                 modal.type === 'settlement' ? '每日结算' : 
+                 modal.type === 'marketWarehouse' ? '市场/仓库' :
+                 modal.type === 'profile' ? '用户信息' :
+                 modal.type === 'settings' ? '设置' :
+                 modal.type === 'confirmReset' ? '提示' : '田块信息'}
+              </h2>
+              <button onClick={handleClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold">✕</button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              {modal.type === 'shop' && <ShopContent game={game} />}
+              {modal.type === 'marketWarehouse' && <MarketWarehouseContent game={game} />}
+              {modal.type === 'settlement' && <SettlementContent game={game} />}
+              {modal.type === 'tileInfo' && <TileInfoContent game={game} />}
+              {modal.type === 'profile' && <ProfileContent game={game} />}
+              {modal.type === 'settings' && <SettingsContent game={game} />}
+              {modal.type === 'confirmReset' && <ConfirmResetContent game={game} />}
+            </div>
+            {modal.type === 'shop' && (
+              <div className="p-4 border-t border-slate-200 bg-slate-50 font-bold text-slate-800">
+                当前金币: 💰 {state.money}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+function BottomBtn({ label, sub, isActive, onClick }) {
+      // 动态样式配置
+      const baseStyle = "relative h-14 w-full rounded-lg flex flex-col items-center justify-center transition-all duration-100 active:scale-95 active:translate-y-1 select-none overflow-hidden";
+      
+      // 木头纹理（CSS 条纹模拟）
+      const woodTexture = {
+        backgroundImage: isActive 
+          ? 'repeating-linear-gradient(45deg, rgba(0,0,0,0.1), rgba(0,0,0,0.1) 10px, transparent 10px, transparent 20px)' // 激活：深色压痕纹理
+          : 'repeating-linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.1) 10px, transparent 10px, transparent 20px)' // 未激活：亮色高光纹理
+      };
+
+      // 颜色状态：激活(深木色/按下) vs 未激活(亮木色/凸起)
+      const colorClass = isActive
+        ? 'bg-[#5c3a18] border-2 border-[#3e2713] shadow-[inset_0_3px_6px_rgba(0,0,0,0.6)]' 
+        : 'bg-[#e6b88a] border-b-4 border-r-2 border-l-2 border-t border-[#8b5a2b] shadow-[0_2px_0_#5c3a18]';
+
+      // 文字颜色
+      const textMain = isActive ? 'text-amber-100 drop-shadow-md' : 'text-[#5c3a21]';
+      const textSub = isActive ? 'text-amber-200/80' : 'text-[#8b5a2b]';
+
+      return (
+        <button onClick={onClick} className={`${baseStyle} ${colorClass}`} style={woodTexture}>
+          {/* 四角的铆钉效果 */}
+          {!isActive && (
+            <>
+              <div className="absolute top-1 left-1 w-1.5 h-1.5 rounded-full bg-[#5c3a18] opacity-60" />
+              <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#5c3a18] opacity-60" />
+              <div className="absolute bottom-1 left-1 w-1.5 h-1.5 rounded-full bg-[#5c3a18] opacity-60" />
+              <div className="absolute bottom-1 right-1 w-1.5 h-1.5 rounded-full bg-[#5c3a18] opacity-60" />
+            </>
+          )}
+
+          {/* 内容区域 */}
+          <div className="relative z-10 flex flex-col items-center">
+            <div className={`text-sm font-black tracking-widest ${textMain}`} style={{ fontFamily: 'monospace' }}>
+              {label}
+            </div>
+            {sub && (
+              <div className={`text-[10px] mt-0.5 font-bold ${textSub} scale-90`}>
+                {sub}
+              </div>
+            )}
+          </div>
+        </button>
+      );
+    }
+
+    function ToggleSwitch({ on, onToggle }) {
+      return (
+        <button
+          onClick={onToggle}
+          className={`w-14 h-8 rounded-full p-1 transition-colors active:scale-95 ${on ? 'bg-green-500' : 'bg-slate-300'}`}
+        >
+          <div
+            className={`w-6 h-6 rounded-full bg-white shadow transition-transform ${on ? 'translate-x-6' : 'translate-x-0'}`}
+          />
+        </button>
+      );
+    }
+
+    function SettingsContent({ game }) {
+      const { UI, state } = game;
+      // 将 0-1 的小数转换为 0-100 的整数用于显示
+      const volumePercent = Math.round((UI.audioVolume ?? 0.5) * 100);
+
+      return (
+        <div className="flex flex-col gap-4">
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-sm">
+            <div className="flex justify-between items-end mb-2">
+              <div className="font-bold text-slate-700 flex items-center gap-2">
+                <span>🔊</span> 背景音乐
+              </div>
+              <div className="text-sm font-bold text-amber-600 font-mono">
+                {volumePercent}%
+              </div>
+            </div>
+
+            {/* 音量滑块 */}
+            <div className="relative h-6 flex items-center">
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={volumePercent}
+                onChange={(e) => {
+                  const newVol = parseInt(e.target.value, 10) / 100;
+                  game.setAudioVolume(newVol);
+                }}
+                className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-amber-500"
+                style={{
+                  // 这是一个简单的 CSS 技巧，让滑块左边是深色，右边是浅色
+                  background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${volumePercent}%, #e2e8f0 ${volumePercent}%, #e2e8f0 100%)`
+                }}
+              />
+            </div>
+            
+            <div className="flex justify-between text-[10px] text-slate-400 mt-1 px-1">
+              <span>静音</span>
+              <span>最大</span>
+            </div>
+          </div>
+
+
+          {/* === 新增：显示作物名称开关 === */}
+          <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 shadow-sm flex justify-between items-center">
+            <div className="font-bold text-slate-700 flex items-center gap-2">
+              <span>🏷️</span> 显示作物名称
+            </div>
+            <ToggleSwitch 
+              on={UI.showCropLabels} 
+              onToggle={() => {
+                UI.showCropLabels = !UI.showCropLabels;
+                game.saveProgress(); // 顺手存个档
+                game.notify();       // 刷新画面
+              }} 
+            />
+          </div>
+          {/* ================================ */}
+
+
+          <button
+            className="w-full py-3 bg-red-600 text-white rounded-xl font-bold active:scale-95 shadow-sm mt-2"
+            onClick={() => {
+              UI.modal = { type: 'confirmReset', data: { returnTo: 'settings' } };
+              game.notify();
+            }}
+          >
+            删除存档并重置
+          </button>
+        </div>
+      );
+    }
+
+    function ConfirmResetContent({ game }) {
+      const { UI } = game;
+      const returnTo = UI.modal?.data?.returnTo;
+
+      return (
+        <div className="flex flex-col gap-4 py-3">
+          <div className="text-center text-3xl">🗑️</div>
+          <div className="text-center font-bold text-lg">注销当前游戏进度？</div>
+          <div className="text-center text-sm text-slate-600">将清除本地存档并初始化游戏。</div>
+          <div className="flex gap-3">
+            <button
+              className="flex-1 py-3 bg-slate-100 text-slate-700 rounded-xl font-bold active:scale-95"
+              onClick={() => {
+                UI.modal = returnTo ? { type: returnTo, data: null } : null;
+                game.notify();
+              }}
+            >
+              取消
+            </button>
+            <button
+              className="flex-1 py-3 bg-red-600 text-white rounded-xl font-bold active:scale-95"
+              onClick={() => {
+                game.clearProgress();
+                game.resetGame();
+              }}
+            >
+              确定
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    function AvatarImage({ src, className }) {
+      const [imgError, setImgError] = useState(false);
+      if (!src || imgError) {
+        return (
+          <div className={`flex items-center justify-center bg-amber-200 text-2xl ${className ?? ''}`}>
+            🧑‍🌾
+          </div>
+        );
+      }
+      return (
+        <img
+          src={src}
+          alt="avatar"
+          className={className}
+          onError={() => setImgError(true)}
+          referrerPolicy="no-referrer"
+          style={{ imageRendering: 'auto' }}
+        />
+      );
+    }
+
+    function ProfileContent({ game }) {
+      const { state } = game;
+      const { level, total, nextNeed, currentNeed } = game.getLevelInfo();
+      const title = game.getUserTitle();
+      const codexEntries = Object.entries(state.codex ?? {});
+      const progressPct = Math.max(0, Math.min(1, (total - currentNeed) / Math.max(1, nextNeed - currentNeed)));
+      const [showAvatarPicker, setShowAvatarPicker] = useState(false);
+
+      return (
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4 bg-slate-50 border border-slate-200 rounded-xl p-3">
+            <button
+              onClick={() => setShowAvatarPicker((v) => !v)}
+              className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-amber-500 shadow active:scale-95"
+            >
+              <AvatarImage src={state.userProfile?.avatarId} className="w-full h-full object-cover" />
+            </button>
+            <div className="flex-1">
+              <div className="font-bold text-slate-800">{title}</div>
+              <div className="text-xs text-slate-500 mt-0.5">Lv {level}</div>
+              <div className="text-xs text-slate-500 mt-1">种植收益累计：{total} 💰</div>
+              <div className="mt-2 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div className="h-full bg-amber-400 transition-all" style={{ width: `${progressPct * 100}%` }} />
+              </div>
+              <div className="text-[10px] text-slate-500 mt-1">
+                下一等级需要：{nextNeed} 💰
+              </div>
+            </div>
+          </div>
+
+          {showAvatarPicker && (
+            <div>
+              <div className="text-sm font-bold text-slate-700 mb-2">选择头像</div>
+              <div className="grid grid-cols-4 gap-2">
+                {PROFILE_AVATARS.map((avatar) => {
+                  const active = state.userProfile?.avatarId === avatar;
+                  return (
+                    <button
+                      key={avatar}
+                      onClick={() => {
+                        state.userProfile = { ...state.userProfile, avatarId: avatar };
+                        game.saveProgress();
+                        game.notify();
+                      }}
+                      className={`w-full aspect-square rounded-xl overflow-hidden border-2 ${active ? 'border-amber-500' : 'border-transparent'} bg-slate-100 active:scale-95`}
+                    >
+                      <AvatarImage src={avatar} className="w-full h-full object-cover" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <div className="text-sm font-bold text-slate-700 mb-2">已解锁图鉴</div>
+            {codexEntries.length === 0 ? (
+              <div className="text-center text-slate-400 py-6">暂无解锁</div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2">
+                {codexEntries.map(([plantId, grade]) => {
+                  const plant = window.GameStore.PlantDB[plantId];
+                  if (!plant) return null;
+                  return (
+                    <div key={plantId} className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-2">
+                      <div className="w-8 h-8 flex items-center justify-center bg-white rounded-md border border-slate-100">
+                        <CropIcon plant={plant} stage="mature" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-slate-700">{plant.name}</div>
+                        <div className="text-[10px] text-slate-500">评分 {grade}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function ShopContent({ game }) {
+      const { state } = game;
+      const [tab, setTab] = React.useState('props');
+      const plantIds = Object.keys(window.GameStore.PlantDB);
+      
+      const propItems = [
+        { kind: 'seedPack' },
+        { kind: 'unlockTile' },
+        { kind: 'fertilizer' },
+        { kind: 'pesticide' },
+        { kind: 'ripener' },
+        { kind: 'antifreeze' },
+      ];
+
+      const cropItems = plantIds.map(id => state.unlockedPlants[id] ? { kind: 'seed', plantId: id } : { kind: 'unlockPlant', plantId: id });
+
+      const items = tab === 'props' ? propItems : cropItems;
+
+      return (
+        <div className="flex flex-col h-full">
+          <div className="flex gap-2 mb-4">
+            <button 
+              className={`flex-1 py-2 rounded-lg font-bold text-sm ${tab === 'props' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+              onClick={() => setTab('props')}
+            >
+              道具
+            </button>
+            <button 
+              className={`flex-1 py-2 rounded-lg font-bold text-sm ${tab === 'crops' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+              onClick={() => setTab('crops')}
+            >
+              农作物
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            {items.map((item, i) => {
+              let name = '';
+              let price = 0;
+              let sub = '';
+              let actionText = '购买';
+              let disabled = false;
+
+              if (item.kind === 'seed') {
+                const p = window.GameStore.PlantDB[item.plantId];
+                name = p.name;
+                price = p.cost;
+                const sellNow = game.getSellPriceNow(p.id);
+                const pct = Math.round(((state.market[p.id] ?? 1) - 1) * 100);
+                const trend = pct >= 0 ? `+${pct}%` : `${pct}%`;
+                sub = `当前行情售卖 +${sellNow}（${trend}）`;
+              } else if (item.kind === 'fertilizer') {
+                name = '肥料';
+                price = 12;
+                sub = '结算时额外成长';
+              } else if (item.kind === 'pesticide') {
+                name = '杀虫剂';
+              price = 18;
+              sub = '喷洒后获得 3 天免疫';
+            } else if (item.kind === 'ripener') {
+              name = '催熟剂';
+              price = 28;
+              sub = '使用后提前 0.5 天成熟';
+            } else if (item.kind === 'antifreeze') {
+              name = '抗冻剂';
+              price = 35;
+              sub = '3 天免受霜冻健康损失';
+            } else if (item.kind === 'seedPack') {
+              name = '种子包解锁';
+              price = 140;
+              const lockedCount = plantIds.filter((id) => !state.unlockedPlants[id]).length;
+              sub = lockedCount ? `随机解锁 1 种植物（剩余 ${lockedCount}）` : '已全部解锁';
+              disabled = lockedCount === 0;
+              actionText = '解锁';
+            } else if (item.kind === 'unlockPlant') {
+              const p = window.GameStore.PlantDB[item.plantId];
+              name = `${p.name}（${p.category === 'veg' ? '蔬菜' : '花卉'}）`;
+              price = p.unlockPrice;
+              sub = '解锁后可在商店购买该种子';
+              disabled = state.unlockedPlants[p.id];
+              actionText = '解锁';
+            } else if (item.kind === 'unlockTile') {
+              name = '解锁新地块';
+              const cost = game.getNextTileUnlockCost();
+              price = cost ?? 0;
+              const unlocked = game.getUnlockedTileCount();
+              sub = `土地 ${window.GameStore.GRID_SIZE}×${window.GameStore.GRID_SIZE}（已解锁 ${unlocked}/${window.GameStore.GRID_SIZE * window.GameStore.GRID_SIZE * window.GameStore.PAGES}）`;
+              disabled = cost == null;
+            }
+
+            const getIcon = () => {
+              if (item.kind === 'seed' || item.kind === 'unlockPlant') {
+                return <CropIcon plant={window.GameStore.PlantDB[item.plantId]} stage="seed" />;
+              }
+              if (item.kind === 'fertilizer') return <span className="text-2xl">💩</span>;
+              if (item.kind === 'pesticide') return <span className="text-2xl">🛡️</span>;
+              if (item.kind === 'ripener') return <span className="text-2xl">✨</span>;
+              if (item.kind === 'antifreeze') return <span className="text-2xl">🧊</span>;
+              if (item.kind === 'seedPack') return <span className="text-2xl">🎁</span>;
+              if (item.kind === 'unlockTile') return <span className="text-2xl">🗺️</span>;
+              return null;
+            };
+
+            return (
+              <div key={i} className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center">
+                <div className="flex items-center gap-3 flex-1 pr-2">
+                  <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+                    {getIcon()}
+                  </div>
+                  <div>
+                    <div className="font-bold text-sm text-slate-800">{name}</div>
+                    <div className="text-xs text-slate-500 mt-1">{sub}</div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="text-sm font-bold text-slate-700">
+                    {disabled ? '—' : `💰 ${price}`}
+                  </div>
+                  <button
+                    disabled={disabled || state.money < price}
+                    onClick={() => { game.tryBuyShopItem({ ...item, price, disabled }); game.notify(); }}
+                    className="px-4 py-1.5 bg-blue-600 text-white text-xs font-bold rounded-lg disabled:opacity-50 disabled:bg-slate-400 active:scale-95 transition-transform"
+                  >
+                    {actionText}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+          </div>
+        </div>
+      );
+    }
+
+    function MarketWarehouseContent({ game }) {
+      const { state, UI } = game;
+      const tab = UI.modal.data?.tab ?? 'market';
+      const plantIds = Object.keys(window.GameStore.PlantDB);
+
+      return (
+        <div className="flex flex-col h-full">
+          <div className="flex gap-2 mb-4">
+            <button 
+              className={`flex-1 py-2 rounded-lg font-bold text-sm ${tab === 'market' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+              onClick={() => { UI.modal.data = { tab: 'market' }; game.notify(); }}
+            >
+              市场信息
+            </button>
+            <button 
+              className={`flex-1 py-2 rounded-lg font-bold text-sm ${tab === 'warehouse' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+              onClick={() => { UI.modal.data = { tab: 'warehouse' }; game.notify(); }}
+            >
+              仓库信息
+            </button>
+          </div>
+
+          {tab === 'market' && (
+            <div>
+              <div className="text-xs text-slate-500 mb-3">当天收购价（80%~120%波动）</div>
+              <div className="flex flex-col gap-2">
+                {plantIds.map(id => {
+                  const p = window.GameStore.PlantDB[id];
+                  const price = game.getSellPriceNow(id);
+                  return (
+                    <div key={id} className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+                          <CropIcon plant={p} stage="mature" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-sm">{p.name} <span className="text-xs font-normal text-slate-500">({p.category === 'veg' ? '蔬菜' : '花卉'})</span></div>
+                          <div className="text-xs text-slate-500 mt-1">基准 {p.sellPrice}</div>
+                        </div>
+                      </div>
+                      <div className="font-bold text-green-600">
+                        💰 +{price}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="text-xs text-slate-400 mt-4 text-center">售卖公式：当天价 × (收割时健康度/100)</div>
+            </div>
+          )}
+
+          {tab === 'warehouse' && (
+            <div>
+              <div className="text-xs text-slate-500 mb-3 font-bold">
+                容量：{game.getWarehouseUsed()}/{state.warehouseCapacity}
+              </div>
+              <button
+                onClick={() => game.sellAllWarehouse()}
+                className="w-full py-2.5 mb-3 bg-green-700 text-white rounded-xl font-bold text-sm active:scale-95 disabled:opacity-60"
+                disabled={!state.warehouseLots.length}
+              >
+                一键售卖全部
+              </button>
+              <div className="flex flex-col gap-2 mb-4">
+                {(() => {
+                  const counts = {};
+                  const avgHealth = {};
+                  for (const lot of state.warehouseLots) {
+                    counts[lot.plantId] = (counts[lot.plantId] ?? 0) + lot.count;
+                    avgHealth[lot.plantId] = (avgHealth[lot.plantId] ?? 0) + lot.health * lot.count;
+                  }
+                  const plantRows = plantIds.filter((id) => (counts[id] ?? 0) > 0);
+                  
+                  if (plantRows.length === 0) {
+                    return <div className="text-center text-slate-400 py-8">仓库空空如也</div>;
+                  }
+
+                  return plantRows.map(id => {
+                    const c = counts[id];
+                    const p = window.GameStore.PlantDB[id];
+                    const healthAvg = Math.round(avgHealth[id] / Math.max(1, c));
+                    const price = game.getSellPriceNow(id);
+                    const est = Math.round(price * (healthAvg / 100));
+
+                    const pct = Math.round(((state.market[id] ?? 1) - 1) * 100);
+                    const trendText = pct >= 0 ? `↑ ${pct}%` : `↓ ${pct}%`;
+                    console.log(state.market[id])
+                    // 升用绿色(green)，降用红色(red)
+                    const trendColor = pct >= 0 ? 'text-green-600' : 'text-red-500';
+
+                    return (
+                      <div key={id} className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center">
+                        <div>
+                          <div className="font-bold text-sm">{p.icon} {p.name} <span className="text-blue-600">x{c}</span></div>
+                          <div className="text-xs text-slate-500 mt-1">平均健康 {healthAvg}，当前单价约 +{est}
+                            <span className={`ml-1 font-bold ${trendColor}`}>
+                              ({trendText})
+                            </span>
+
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => game.sellAllOfPlant(id)}
+                          className="px-4 py-1.5 bg-green-600 text-white text-xs font-bold rounded-lg active:scale-95"
+                        >
+                          售卖
+                        </button>
+                      </div>
+                    );
+                  });
+                })()}
+              </div>
+              <button 
+                onClick={() => game.tryExpandWarehouse()}
+                className="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-sm active:scale-95"
+              >
+                扩建仓库（-{game.getWarehouseExpandCost()} 金币）
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    function SettlementContent({ game }) {
+      const data = game.UI.modal.data;
+      const deaths = data.deathList.length ? data.deathList.join('、') : '无';
+      
+      return (
+        <div className="flex flex-col gap-4 py-4">
+          <div className="text-center text-4xl mb-2">🌙</div>
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col gap-2">
+            <div className="flex justify-between">
+              <span className="text-slate-600">今天赚了:</span>
+              <span className="font-bold text-green-600">+{data.earned} 💰</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600">枯死作物:</span>
+              <span className="font-bold text-red-500">{deaths}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-slate-600">虫害触发:</span>
+              <span className="font-bold">{data.pestCount ? `是 (${data.pestCount}处)` : '否'}</span>
+            </div>
+          </div>
+          <div className="text-xs text-slate-400 text-center mt-2">
+            提示: 长按田块查看详细信息与预计收益
+          </div>
+        </div>
+      );
+    }
+
+    function TileInfoContent({ game }) {
+      const data = game.UI.modal.data;
+      const tile = game.state.farmGrid[data.tileIdx];
+      if (!tile) return null;
+
+      const stage = game.getPlantStage(tile);
+      const plant = tile.plantId ? window.GameStore.PlantDB[tile.plantId] : null;
+      const growthDays = plant?.growthDays ?? 0;
+      const maturity = plant ? Math.max(0, Math.min(1, tile.daysGrown / Math.max(1, growthDays))) : 0;
+      const maturityPct = Math.floor(maturity * 100);
+      const pesticideText = tile.pesticideDays > 0 ? `是（剩余 ${tile.pesticideDays} 天）` : '否';
+      const antifreezeText = tile.antifreezeDays > 0 ? `是（剩余 ${tile.antifreezeDays} 天）` : '否';
+      const expected = tile.plantId ? game.getSellValueForLot(tile.plantId, tile.health, tile.sellMultiplier) : 0;
+      const sellMulText = tile.plantId ? `x${(tile.sellMultiplier ?? 1).toFixed(2)}` : '—';
+      const soilHealth = game.getSoilHealth(tile);
+
+      return (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-3 mb-2 p-2 bg-slate-50 rounded-xl border border-slate-100">
+            <div className="w-12 h-12 flex items-center justify-center bg-white rounded-lg border border-slate-100 shadow-sm overflow-hidden">
+              {plant ? <CropIcon plant={plant} stage={stage} /> : <span className="text-2xl text-slate-300">🕳️</span>}
+            </div>
+            <div>
+              <div className="font-bold text-slate-800">{plant ? plant.name : '空地'}</div>
+              <div className="text-xs text-slate-500">{plant ? (plant.category === 'veg' ? '蔬菜' : '花卉') : '点击选择种子播种'}</div>
+            </div>
+          </div>
+          <InfoRow label="阶段" value={stage === 'seed' ? '种子' : stage === 'sprout' ? '发芽' : stage === 'growing' ? '生长期' : stage === 'mature' ? '成熟' : stage === 'dead' ? '枯死' : '—'} />
+          <InfoRow label="健康度" value={tile.health.toString()} />
+          <InfoRow label="成熟度" value={plant ? `${maturityPct}%` : '—'} />
+          <div className="h-px bg-slate-200 my-1" />
+          <InfoRow label="土壤肥沃" value={tile.soilFertility.toString()} />
+          <InfoRow label="土壤湿润" value={tile.soilMoisture.toString()} />
+          <InfoRow label="土地健康度" value={soilHealth.toFixed(2)} />
+          <div className="h-px bg-slate-200 my-1" />
+          <InfoRow label="虫剂保护" value={pesticideText} />
+          <InfoRow label="抗冻保护" value={antifreezeText} />
+          <div className="h-px bg-slate-200 my-1" />
+          <InfoRow label="收益系数" value={sellMulText} />
+          <InfoRow label="预计收益" value={plant ? `💰 +${expected}` : '—'} highlight />
+        </div>
+      );
+    }
+
+    function InfoRow({ label, value, highlight }) {
+      return (
+        <div className="flex justify-between items-center py-1">
+          <span className="text-slate-500 text-sm">{label}</span>
+          <span className={`text-sm font-bold ${highlight ? 'text-green-600' : 'text-slate-800'}`}>{value}</span>
+        </div>
+      );
+    }
+
+    function getPickerOptions(game) {
+      const { UI, state } = game;
+      if (!UI.picker) return [];
+      if (UI.picker.type === 'tool') {
+        const opts = [
+          { id: 'water', label: '🧺 浇水壶', extra: state.goldenCanUnlocked ? '可切换黄金' : null },
+          { id: 'sickle', label: '☭ 镰刀', extra: null },
+          { id: 'shovel', label: '⛏️ 铲子', extra: null },
+        ];
+        if (state.goldenCanUnlocked) opts.unshift({ id: 'goldWater', label: '✨ 黄金喷壶', extra: '2×2' });
+        return opts;
+      }
+      if (UI.picker.type === 'item') {
+        return [
+          { id: 'fertilizer', label: '💩 肥料', extra: `x${game.getInventoryCount('fertilizer')}` },
+          { id: 'pesticide', label: '🛡️ 杀虫剂', extra: `x${game.getInventoryCount('pesticide')}` },
+          { id: 'ripener', label: '✨ 催熟剂', extra: `x${game.getInventoryCount('ripener')}` },
+          { id: 'antifreeze', label: '🧊 抗冻剂', extra: `x${game.getInventoryCount('antifreeze')}` },
+        ];
+      }
+      if (UI.picker.type === 'seed') {
+        return Object.keys(window.GameStore.PlantDB)
+          .filter((id) => state.unlockedPlants[id])
+          .map((id) => ({ id, label: window.GameStore.PlantDB[id].name, extra: `x${game.getInventoryCount(id)}`, plantId: id }));
+      }
+      return [];
+    }
+
+    function getToolName(selected) {
+      if (selected.kind !== 'tool') return '农具';
+      if (selected.id === 'goldWater') return '黄金喷壶';
+      if (selected.id === 'water') return '浇水壶';
+      if (selected.id === 'shovel') return '铲子';
+      if (selected.id === 'sickle') return '镰刀';
+      return '农具';
+    }
+
+    function getItemName(selected) {
+      if (selected.kind !== 'item') return '道具';
+      if (selected.id === 'fertilizer') return '肥料';
+      if (selected.id === 'pesticide') return '杀虫剂';
+      if (selected.id === 'ripener') return '催熟剂';
+      if (selected.id === 'antifreeze') return '抗冻剂';
+      return '道具';
+    }
+
+    function getSeedName(selected) {
+      if (selected.kind !== 'seed') return '种子';
+      return window.GameStore.PlantDB[selected.id]?.name ?? '种子';
+    }
+
+    // ==================== Main App ====================
+    function App() {
+      const game = useStore();
+      const state = game.state;
+      const UI = game.UI;
+
+      const [now, setNow] = useState(Date.now());
+      const [page, setPage] = useState(0);
+      const [bootLoaded, setBootLoaded] = useState(false);
+      const [bootFading, setBootFading] = useState(false);
+      const [bootDismissed, setBootDismissed] = useState(false);
+
+      useEffect(() => {
+        const t = window.setTimeout(() => setBootLoaded(true), 600);
+        return () => window.clearTimeout(t);
+      }, []);
+
+      useEffect(() => {
+        window.GameStore.audioManager.updateWeather(state.currentWeather);
+      }, [state.currentWeather]);
+
+      useEffect(() => {
+        const timer = setInterval(() => {
+          const currentTime = Date.now();
+          setNow(currentTime); // 触发时钟更新
+
+          const currentState = game.state;
+          const currentUI = game.UI;
+          let shouldNotify = false;
+
+          if (UI.toast && currentTime >= UI.toast.until) {
+            UI.toast = null;
+            shouldNotify = true;
+          }
+
+          // === 修复 1：清理过期的浮动文字（解决内存泄漏） ===
+          if (UI.floatingTexts.length > 0) {
+            const validTexts = UI.floatingTexts.filter(ft => currentTime < ft.createdAt + ft.duration);
+            if (validTexts.length !== UI.floatingTexts.length) {
+              UI.floatingTexts = validTexts;
+              shouldNotify = true; // 只有在清理了文字时才通知画面刷新
+            }
+          }
+          // ===================================================
+
+          // 跨天结算判断
+          if (currentTime >= state.nextDayAt) {
+            game.endDayAndStartNext();
+            shouldNotify = false; // endDayAndStartNext 内部会 notify，这里避免重复
+          }
+          
+          // 弹窗自动关闭判断
+          if (UI.modal?.type === 'settlement' && UI.modal.autoCloseAt && currentTime >= UI.modal.autoCloseAt) {
+            UI.modal = null;
+            shouldNotify = true;
+          }
+
+          if (shouldNotify) {
+            game.notify();
+          }
+        }, 1000);
+        return () => clearInterval(timer);
+      }, [game]);
+
+      const remainingMs = Math.max(0, state.nextDayAt - now);
+      const progress = 1 - Math.max(0, Math.min(1, remainingMs / window.GameStore.DAY_DURATION_MS));
+      const sec = Math.ceil(remainingMs / 1000);
+      const mm = String(Math.floor(sec / 60)).padStart(2, '0');
+      const ss = String(sec % 60).padStart(2, '0');
+
+      const weather = window.GameStore.WeatherDB[state.currentWeather];
+      const forecastWeather = state.forecastWeatherId ? window.GameStore.WeatherDB[state.forecastWeatherId] : null;
+      const { level } = game.getLevelInfo();
+      const userTitle = game.getUserTitle();
+
+      const handleStart = () => {
+        if (bootDismissed || bootFading || !bootLoaded) return;
+        const currentSeason = game.getSeason(state.currentDay);
+        window.GameStore.audioManager.init(currentSeason);
+        //window.GameStore.audioManager.init();
+        window.GameStore.audioManager.updateWeather(state.currentWeather);
+        setBootFading(true);
+        window.setTimeout(() => setBootDismissed(true), 200);
+      };
+
+      const handleTileClick = (idx) => {
+        game.actOnTile(idx);
+      };
+
+      const handleTileLongPress = (idx) => {
+        UI.modal = { type: 'tileInfo', data: { tileIdx: idx } };
+        game.notify();
+      };
+
+      const getTileBgColor = (tile) => {
+        if (!tile.isUnlocked) return 'bg-yellow-900/50';
+        const health = game.getSoilHealth(tile);
+        if (health >= 0.999) return 'bg-yellow-950';
+        if (health >= 0.8) return 'bg-yellow-900';
+        if (health >= 0.6) return 'bg-yellow-800';
+        if (health >= 0.4) return 'bg-yellow-700';
+        if (health >= 0.2) return 'bg-amber-600';
+        return 'bg-lime-400';
+      };
+
+      const renderTileContent = (tile) => {
+        if (!tile.isUnlocked) {
+          return <div className="text-xs text-slate-900 font-bold">×</div>;
+        }
+        if (!tile.plantId) {
+          return <div className="text-xs text-slate-800/50"></div>;
+        }
+        const plant = window.GameStore.PlantDB[tile.plantId];
+        const stage = game.getPlantStage(tile);
+        
+        return (
+          <div className="flex flex-col items-center justify-center absolute inset-0">
+            <CropIcon plant={plant} stage={stage} />
+            {/* === 修改这里：加上 UI.showCropLabels 的判断 === */}
+            {UI.showCropLabels && (
+              <div className="text-[10px] md:text-xs text-slate-900 font-bold bg-white/50 px-1 rounded whitespace-nowrap overflow-hidden text-ellipsis max-w-[90%]">
+                {plant.name}
+              </div>
+            )}
+            {/* ========================================= */}
+
+            <div className="absolute top-1 right-1 flex gap-0.5 text-xs">
+              {state.currentWeather === 'Freeze' && stage !== 'dead' && <span>❄️</span>}
+              {tile.pesticideDays > 0 && stage !== 'dead' && <span>🛡️</span>}
+              {tile.antifreezeDays > 0 && stage !== 'dead' && <span>🧊</span>}
+              {tile.buggedToday && stage !== 'dead' && <span>🐛</span>}
+            </div>
+          </div>
+        );
+      };
+
+      return (
+        <div className="min-h-screen bg-pastoral text-slate-100 font-sans select-none flex flex-col max-w-md mx-auto relative overflow-hidden">
+          {!bootDismissed && (
+            <div
+              className={`fixed inset-0 z-[999] flex items-center justify-center pf-load-screen transition-opacity duration-200 ${bootFading ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+            >
+              <div className="absolute inset-0 bg-slate-950/40" />
+              <div className="relative w-full flex flex-col items-center justify-center px-6 pb-safe pt-safe">
+{/* === 修正后的标题容器 === */}
+            <div className="relative mb-14 z-10 flex flex-col items-center">
+              
+              {/* 1. 顶部装饰：小嫩芽 (跟随标题一起浮动，不要单独跳) */}
+              <div 
+                className="text-5xl absolute -top-10 left-1/2 -translate-x-1/2 z-20"
+                style={{ 
+                  animation: 'gentle-float 3s ease-in-out infinite',
+                  textShadow: '0 4px 0 rgba(0,0,0,0.2)'
+                }}
+              >
+                🌱
+              </div>
+
+              {/* 2. 核心标题：终极清晰版 */}
+              <div 
+                className="relative text-[clamp(48px,14vw,80px)] select-none leading-none"
+                style={{
+                  // 1. 字体：继续用快乐体，或者换回系统黑体 "Heiti SC", "SimHei" 以获得最清晰的笔画
+                  fontFamily: '"ZCOOL KuaiLe", "Arial Black", sans-serif',
+                  fontWeight: '400',
+                  
+                  // 2. 核心修复技术：paint-order
+                  // 这行代码命令浏览器：先画描边(stroke)，再画填充(fill)。
+                  // 这样描边就不会盖住字里面的白色缝隙了！
+                  WebkitTextStroke: '5px #451a03', // 这里的宽度可以设得很粗，因为只会向外长
+                  paintOrder: 'stroke fill', 
+                  
+                  // 3. 颜色填充 (金色渐变)
+                  backgroundImage: 'linear-gradient(180deg, #ffffff 10%, #fcd34d 50%, #d97706 90%)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  color: 'transparent',
+                  WebkitTextFillColor: 'transparent',
+                  
+                  // 4. 阴影：只保留立体厚度和投影，不再用来做描边
+                  filter: 'drop-shadow(0 4px 0 #451a03) drop-shadow(0 10px 5px rgba(0,0,0,0.3))',
+                  
+                  // 5. 动画
+                  animation: 'gentle-float 3s ease-in-out infinite'
+                }}
+              >
+                像素农场
+              </div>
+
+              {/* 3. 副标题：保持原木风格，也跟随浮动 */}
+              <div 
+                className="mt-4 px-4 py-1 bg-[#5c3a18] rounded-lg border-2 border-[#8b5a2b] shadow-lg transform -rotate-2"
+                style={{ 
+                  animation: 'gentle-float 3s ease-in-out infinite', 
+                  animationDelay: '0.1s' // 稍微错开一点时间，更有动感
+                }}
+              >
+                <div className="text-amber-100 font-bold tracking-[0.2em] text-xs md:text-sm font-mono">
+                  PIXEL FARM
+                </div>
+              </div>
+            </div>
+                <div className="pf-load-track">
+                  <div className="pf-load-bar" />
+                </div>
+                <div className="h-10 mt-8 flex items-center justify-center">
+                  {bootLoaded && (
+                    <button className="pf-wood-btn" onClick={handleStart}>
+                      开始耕种
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="bg-slate-800 p-4 shadow-md z-10">
+            <div className="flex justify-between items-start mb-2">
+              <div className="flex items-start gap-3 flex-1">
+                <button
+                  onClick={() => {
+                    UI.modal = { type: 'profile', data: null };
+                    game.notify();
+                  }}
+                  className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-amber-500 shadow active:scale-95"
+                >
+                  <AvatarImage src={state.userProfile?.avatarId} className="w-full h-full object-cover" />
+                </button>
+                <div className="flex-1">
+                  <div className="text-amber-200 font-bold text-sm mb-0.5">{userTitle}</div>
+                  <div className="text-[11px] text-slate-300 mb-1">Lv {level}</div>
+
+
+                </div>
+              </div>
+              <div className="flex flex-col items-end">
+                <div className="flex items-center gap-2 mb-1">
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      UI.modal = { type: 'settings', data: null };
+                      game.notify();
+                    }}
+                    className="p-1 bg-slate-700 rounded-full hover:bg-slate-600 active:scale-95 transition-transform"
+                  >
+                    <svg 
+  viewBox="0 0 24 24" 
+  fill="currentColor" 
+  className="w-6 h-6 text-amber-200"
+  style={{ shapeRendering: 'crispEdges' }} // 强制像素边缘清晰
+>
+  <path d="M7 2h2v2h-2zM15 2h2v2h-2zM2 7h2v2H2zM20 7h2v2h-2zM2 15h2v2H2zM20 15h2v2h-2zM7 20h2v2h-2zM15 20h2v2h-2zM9 4h6v2h2v3h3v6h-3v3h-2v2H9v-2H7v-3H4V9h3V6h2V4zm0 4v8h6V8H9z" />
+</svg>
+                  </button>
+                </div>
+                <div className="text-sm font-mono text-blue-300">
+                  {mm}:{ss}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between text-sm text-slate-300 mb=2">
+            <div className="text-yellow-400 font-bold text-lg mb-1">金币: {state.money}</div>
+            <div className="text-sm text-slate-300">
+                    第 {state.currentDay} 天 ({
+                      game.getSeason(state.currentDay) === 'Spring' ? '春' :
+                      game.getSeason(state.currentDay) === 'Summer' ? '夏' :
+                      game.getSeason(state.currentDay) === 'Autumn' ? '秋' : '冬'
+                    }季)
+            </div>
+            </div>
+            <div className="flex items-center justify-between text-sm text-slate-300 mb=2">
+                    <div>今日: {weather.icon} {weather.name} {state.currentTemp}℃</div>
+                    <div>明日: {forecastWeather ? forecastWeather.icon : '？'}</div>
+            </div>
+            <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-blue-500 transition-all duration-1000 linear"
+                style={{ width: `${progress * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center relative overflow-hidden">
+            {page > 0 && (
+              <button 
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-30 transition-all active:scale-95"
+                onClick={() => setPage(page - 1)}
+              >
+                <svg width="24" height="72" viewBox="0 0 24 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="18,18 -4,2 -4,70 18,54" fill="#d4a373" stroke="#8b5a2b" strokeWidth="4" strokeLinejoin="round"/>
+                  <path d="M13 30 L 7 36 L 13 42" stroke="#5c3a21" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            )}
+            {page < window.GameStore.PAGES - 1 && (
+              <button 
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-30 transition-all active:scale-95"
+                onClick={() => setPage(page + 1)}
+              >
+                <svg width="24" height="72" viewBox="0 0 24 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <polygon points="6,18 28,2 28,70 6,54" fill="#d4a373" stroke="#8b5a2b" strokeWidth="4" strokeLinejoin="round"/>
+                  <path d="M11 30 L 17 36 L 11 42" stroke="#5c3a21" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            )}
+            
+            <div 
+              className="flex transition-transform duration-300 ease-in-out w-full h-full absolute inset-0"
+              style={{ transform: `translateX(-${page * 100}%)` }}
+            >
+              {Array.from({ length: window.GameStore.PAGES }).map((_, p) => (
+                <div key={p} className="w-full h-full flex-shrink-0 flex items-center justify-center p-4">
+                  <div 
+                    className="grid gap-2 w-full aspect-square max-w-[400px] z-10 relative"
+                    style={{ gridTemplateColumns: `repeat(${window.GameStore.GRID_SIZE}, minmax(0, 1fr))` }}
+                  >
+                    {state.farmGrid.slice(p * (window.GameStore.GRID_SIZE * window.GameStore.GRID_SIZE), (p + 1) * (window.GameStore.GRID_SIZE * window.GameStore.GRID_SIZE)).map((tile, idxInPage) => {
+                      const idx = p * (window.GameStore.GRID_SIZE * window.GameStore.GRID_SIZE) + idxInPage;
+                      return (
+                        <Tile 
+                          key={tile.id} 
+                          tile={tile} 
+                          bgColor={getTileBgColor(tile)}
+                          onClick={() => handleTileClick(idx)}
+                          onLongPress={() => handleTileLongPress(idx)}
+                        >
+                          {renderTileContent(tile)}
+                        </Tile>
+                      );
+                    })}
+
+                    {UI.floatingTexts.filter(ft => Math.floor(ft.tileIdx / (window.GameStore.GRID_SIZE * window.GameStore.GRID_SIZE)) === p).map(ft => {
+                      const idxInPage = ft.tileIdx % (window.GameStore.GRID_SIZE * window.GameStore.GRID_SIZE);
+                      const row = Math.floor(idxInPage / window.GameStore.GRID_SIZE);
+                      const col = idxInPage % window.GameStore.GRID_SIZE;
+                      return (
+                        <div 
+                          key={ft.id}
+                          className="absolute pointer-events-none font-bold text-lg animate-float-up z-20"
+                          style={{ 
+                            color: ft.color,
+                            left: `calc(${col * (100 / window.GameStore.GRID_SIZE)}% + ${50 / window.GameStore.GRID_SIZE}%)`,
+                            top: `calc(${row * (100 / window.GameStore.GRID_SIZE)}% + ${50 / window.GameStore.GRID_SIZE}%)`,
+                            transform: 'translate(-50%, -50%)',
+                            textShadow: '1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000'
+                          }}
+                        >
+                          {ft.text}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <WeatherOverlay weather={state.currentWeather} />
+          </div>
+
+          <div 
+            className="bg-[#8b5a2b] p-3 pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.2)] z-20 relative border-t-4 border-[#5c3a18]"
+            style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' viewBox=\'0 0 40 40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20zM20 0h20v20H20V0z\' fill=\'%237a4b20\' fill-opacity=\'0.4\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")' }}
+          >
+            {UI.picker && (
+              <div className="absolute bottom-full left-0 w-full p-3 bg-[#f4e4c1] text-[#5c3a21] rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.2)] border-t-4 border-[#d4a373]">
+                <div className="flex justify-between items-center mb-3 px-1">
+                  <h3 className="font-bold text-[#8b5a2b]">
+                    {UI.picker.type === 'tool' ? '选择工具' : UI.picker.type === 'item' ? '选择道具' : '选择种子'}
+                  </h3>
+                  <button onClick={() => { UI.picker = null; game.notify(); }} className="text-[#8b5a2b] p-1 font-bold text-lg">✕</button>
+                </div>
+                <div className="grid grid-cols-3 gap-2 max-h-[40vh] overflow-y-auto p-1">
+                  {getPickerOptions(game).map(opt => {
+                    const isActive = UI.selected.kind === UI.picker.type && UI.selected.id === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        className={`p-2 rounded-xl border-b-4 flex flex-col items-center justify-center text-center h-16 transition-transform active:scale-95 ${
+                          isActive ? 'bg-amber-700 text-amber-50 border-amber-900' : 'bg-[#e6b88a] text-[#5c3a21] border-[#c49363] hover:bg-[#f0c8a0]'
+                        }`}
+                        onClick={() => {
+                          UI.selected = { kind: UI.picker.type, id: opt.id };
+                          UI.picker = null;
+                          game.notify();
+                        }}
+                      >
+                        <div className="flex items-center justify-center mb-1">
+                          {UI.picker.type === 'seed' ? (
+        <div className="flex items-center justify-center w-full gap-0 mb-0 mt-0 px-1">
+          <div className="w-10 h-10 flex-shrink-0 flex items-center justify-center transform scale-90">
+            <CropIcon plant={window.GameStore.PlantDB[opt.plantId]} stage="seed" />
+          </div>
+          <div className="text-sm font-bold truncate text-left flex-1">{opt.label}</div>
+        </div>
+                          ) : (
+                            <div className="text-sm font-bold">{opt.label}</div>
+                          )}
+                        </div>
+                        {UI.picker.type === 'seed' ? (
+                          <div className="text-[20px] font-bold truncate w-full">{opt.label}</div>
+                        ) : null}
+                        {opt.extra && <div className={`text-xs font-medium ${UI.picker.type === 'seed' ? '-mt-2' : 'mt-1.5'}  ${isActive ? 'text-amber-200' : 'text-[#8b5a2b]'}`}>{opt.extra}</div>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-3 gap-2 mb-2">
+              <BottomBtn 
+                label="农具" 
+                sub={getToolName(UI.selected)}
+                isActive={UI.selected.kind === 'tool'} 
+                onClick={() => { UI.picker = UI.picker?.type === 'tool' ? null : { type: 'tool' }; game.notify(); }} 
+              />
+              <BottomBtn 
+                label="道具" 
+                sub={getItemName(UI.selected)}
+                isActive={UI.selected.kind === 'item'} 
+                onClick={() => { UI.picker = UI.picker?.type === 'item' ? null : { type: 'item' }; game.notify(); }} 
+              />
+              <BottomBtn 
+                label="种子" 
+                sub={getSeedName(UI.selected)}
+                isActive={UI.selected.kind === 'seed'} 
+                onClick={() => { UI.picker = UI.picker?.type === 'seed' ? null : { type: 'seed' }; game.notify(); }} 
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <BottomBtn 
+                label="商店" 
+                isActive={UI.modal?.type === 'shop'} 
+                onClick={() => { UI.modal = { type: 'shop', data: null, scrollY: 0, scrollMax: 0 }; game.notify(); }} 
+              />
+              <BottomBtn 
+                label="一键操作" 
+                sub="点击执行"
+                isActive={false} 
+                onClick={() => { game.oneKeyAction(); game.notify(); }} 
+              />
+              <BottomBtn 
+                label="市场/仓库" 
+                isActive={UI.modal?.type === 'marketWarehouse'} 
+                onClick={() => { UI.modal = { type: 'marketWarehouse', data: { tab: 'market' }, scrollY: 0, scrollMax: 0 }; game.notify(); }} 
+              />
+            </div>
+          </div>
+
+          {UI.toast && (
+            <div className="absolute top-43 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-6 py-3 rounded-full text-sm font-medium shadow-lg z-50 whitespace-nowrap pointer-events-none animate-toast">
+              {UI.toast.text}
+            </div>
+          )}
+
+          {UI.modal && <Modal game={game} />}
+        </div>
+      );
+    }
+
+    // ==================== Render ====================
+    //const root = ReactDOM.createRoot(document.getElementById('root'));
+    //root.render(<App />);
+
+export default App;
